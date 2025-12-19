@@ -286,8 +286,14 @@
                 Cornell University - ECE 4760: Designing with Microcontrollers - Fall 2024</p>
 
                 <div class="soundbite">
-                    <strong>Project Sound Bite:</strong> A 12-DOF quadruped robot with 3 servos per leg and WiFi control that uses environmental feedback from an IMU, LiDAR, and infrared temp sensor to navigate, identify targets, and map its environment autonomously using distance and temperature data.
+                    <strong>Project Overview:</strong> A 12-DOF quadruped robot with 3 servos per leg and WiFi control that uses environmental feedback from an IMU, LiDAR, and infrared temp sensor to navigate, identify targets, and map its environment autonomously using distance and temperature data.
                 </div>
+
+                <img src="images/mainphoto.png" alt="Assembled Quadruped Robot - Main View">
+<p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 1: Fully assembled quadruped robot</em></p>
+
+<img src="images/main2.png" alt="Assembled Quadruped Robot - Alternative View">
+<p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 2: Quadruped robot showing sensor array and mechanical structure</em></p>
 
                 <h2 id="summary">Summary</h2>
                 <p>We designed and built a 12 degree-of-freedom (3 servos per leg × 4 legs) quadruped robot controlled by a Raspberry Pi Pico W, featuring integrated environmental sensing and a wireless WiFi controller. Starting from a custom CAD body and 3D-printed frame, the robot combines mechanical engineering and embedded electrical engineering to create a platform capable of coordinated four-legged locomotion, heading determination, environmental mapping, and target detection. In order to do so, our system leverages several sensors including an IMU, a solid state LiDAR sensor, and a contact-less infrared sensor.</p>
@@ -767,11 +773,17 @@ y = r × sin(θ)</pre>
     <p>At this point, the robot begins moving <code>forward()</code>, approaching the hot object. Only once the object is detected using the LiDAR at less than 10 cm away, the robot will halt and say hello using the <code>hi()</code> function. Throughout the entire thermal sweep process, motion commands are blocking, but background servicing remains active through cooperative scheduling.</p>
 
     <h3 id="hardware">Mechanical Design</h3>
-    <p>CAD design renders are available at: <a href="https://drive.google.com/file/d/1ueBsqph4X5NqCqQy36wpwHF9dA-HUB6E/view?usp=drive_link" target="_blank">Google Drive Link</a></p>
+    <img src="images/full_cad.png" alt="Full CAD Assembly - Top View">
+<p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Complete CAD assembly - top view showing all components</em></p>
+
+<img src="images/fullcadbackview.png" alt="Full CAD Assembly - Back View">
+<p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Complete CAD assembly - rear view</em></p>
 
     <h4>Custom Body Design</h4>
     <p>The robot's body is a completely custom design created in CAD to address the specific requirements of our sensor suite and electronics layout. Unlike the legs, which were adapted from an existing open-source design, the body was designed from scratch to provide optimal mounting for the Raspberry Pi Pico W, sensor array, and power distribution system.</p>
-
+<img src="images/bodycad.png" alt="Custom Body CAD Design">
+<p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Custom body CAD design showing 2-layer mounting system</em></p>
+        
     <img src="images/cad_body_top.png" alt="Body CAD - Top View">
     <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Custom body design - top view</em></p>
 
