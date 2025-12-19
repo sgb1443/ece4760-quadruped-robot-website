@@ -823,19 +823,7 @@ y = r × sin(θ)</pre>
 
     <p>The actual visualization uses Matplotlib to place three different figures: a polar scatter plot on the left, a Cartesian scatter plot on the right, and a vertical color scale in between. In the polar plot (<code>ax_polar</code>), the script calls <code>scatter(theta, distances, c=temps_f, cmap=cm.plasma, norm=norm, ...)</code> so that each sample is created as desired. Its axis is configured with <code>set_theta_zero_location("N")</code> so 0 degrees occurs at the very top of the plot, and <code>set_theta_direction(1)</code> so angles increase counterclockwise (consistent with our real sweep). In the Cartesian plot (<code>ax_cart</code>), the script scatters (x, y) with the same colormap and normalization so the two plots share the same temperature relationship. This draws axes lines at x=0 and y=0 to mark the robot's starting point, and measurements are in cm.</p>
 
-    <img src="images/mapping_result.png" alt="Environmental Mapping Result">
-    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Environmental mapping result showing polar and Cartesian views with thermal overlay. The quadruped was centered in a cardboard box enclosure with one end open to a human arm. The square shape of the box is clearly visible, and the higher temperature object (human) is easily recognizable.</em></p>
-
-    <p>On program completion, the Python script prints the total number of samples and launches the plots with <code>plt.show()</code>, which blocks until the user closes the resulting figure. A difficult step was trying to get our C program to automatically call this Python file and display the results on our WiFi AP, but we were restricted by the size of data that we could pass through our WiFi buffer. Implementing C-to-Python communication from the Raspberry Pi to the primary computer also proved significantly more daunting with difficult serial errors. This was eventually achieved but at very low data transmission rates. Live mapping was executed but was eventually scrapped given its complexity and slower data measurement rate.</p>
-
-    <h3>Thermal Scanning Script</h3>
-    <p>Our scanning program implements a scripted temperature scan of its forward-facing environment using controlled rotational motion to record the orientation with the highest detected object temperature before approaching this high-temperature object and waving hello. This program is triggered either from the serial command interface or via the WiFi AP with the "Scan/Approach" button.</p>
-
-    <p>At the start, the quadruped rotates counterclockwise 4 times, corresponding to roughly a 90-degree rotation depending on the surface friction. Then our robot takes a temperature reading before rotating clockwise for a total of 9 samples, corresponding to roughly a 180-degree sweep from the starting position. After each rotation, the program calls <code>refresh_sensor_data()</code> to update all telemetry data, guaranteeing that the robot's recorded temperature value matches the corresponding heading. Each temperature sample is stored in an array indexed by the current rotation number. The program tracks the largest value and checks whether each new measurement surpasses the previous value, replacing the maximum value if so. The program saves the largest temperature's index in order to recall what orientation the maximum occurred at, and more specifically how many turns it will take to return to this orientation. Upon scan completion, the routine finds the difference between the current number of rotations (8) and the index for the maximum temperature. A while loop depletes the rotations by going counterclockwise until the two are equal.</p>
-
-    <p>At this point, the robot begins moving <code>forward()</code>, approaching the hot object. Only once the object is detected using the LiDAR at less than 10 cm away, the robot will halt and say hello using the <code>hi()</code> function. Throughout the entire thermal sweep process, motion commands are blocking, but background servicing remains active through cooperative scheduling.</p>
-
- <div style="text-align: center;">
+        <div style="text-align: center;">
   <img 
     src="images/polarmap.png" 
     alt="Environmental Map"
@@ -845,6 +833,17 @@ y = r × sin(θ)</pre>
     <em>Figure 8: Environmental Map from Robot Sensor Data</em>
   </p>
 </div>
+    
+    <p>On program completion, the Python script prints the total number of samples and launches the plots with <code>plt.show()</code>, which blocks until the user closes the resulting figure. A difficult step was trying to get our C program to automatically call this Python file and display the results on our WiFi AP, but we were restricted by the size of data that we could pass through our WiFi buffer. Implementing C-to-Python communication from the Raspberry Pi to the primary computer also proved significantly more daunting with difficult serial errors. This was eventually achieved but at very low data transmission rates. Live mapping was executed but was eventually scrapped given its complexity and slower data measurement rate.</p>
+
+    <h3>Thermal Scanning Script</h3>
+    <p>Our scanning program implements a scripted temperature scan of its forward-facing environment using controlled rotational motion to record the orientation with the highest detected object temperature before approaching this high-temperature object and waving hello. This program is triggered either from the serial command interface or via the WiFi AP with the "Scan/Approach" button.</p>
+
+    <p>At the start, the quadruped rotates counterclockwise 4 times, corresponding to roughly a 90-degree rotation depending on the surface friction. Then our robot takes a temperature reading before rotating clockwise for a total of 9 samples, corresponding to roughly a 180-degree sweep from the starting position. After each rotation, the program calls <code>refresh_sensor_data()</code> to update all telemetry data, guaranteeing that the robot's recorded temperature value matches the corresponding heading. Each temperature sample is stored in an array indexed by the current rotation number. The program tracks the largest value and checks whether each new measurement surpasses the previous value, replacing the maximum value if so. The program saves the largest temperature's index in order to recall what orientation the maximum occurred at, and more specifically how many turns it will take to return to this orientation. Upon scan completion, the routine finds the difference between the current number of rotations (8) and the index for the maximum temperature. A while loop depletes the rotations by going counterclockwise until the two are equal.</p>
+
+    <p>At this point, the robot begins moving <code>forward()</code>, approaching the hot object. Only once the object is detected using the LiDAR at less than 10 cm away, the robot will halt and say hello using the <code>hi()</code> function. Throughout the entire thermal sweep process, motion commands are blocking, but background servicing remains active through cooperative scheduling.</p>
+
+ 
 
     <h3 id="hardware">Mechanical Design</h3>
 <div style="display: flex; justify-content: center; gap: 20px;">
