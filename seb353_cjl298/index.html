@@ -878,14 +878,14 @@ y = r × sin(θ)</pre>
   <div style="text-align: center; width: 45%;">
     <img src="images/bodyfront.png" alt="Body CAD Front View" style="width: 100%; height: auto;">
     <p style="color: #7f8c8d; font-size: 11px;">
-      <em>Figure: Custom body design – top view</em>
+      <em>Figure: Body CAD Front View</em>
     </p>
   </div>
 
   <div style="text-align: center; width: 45%;">
     <img src="images/bodyback.png" alt="Body CAD Back View, Top Plate Remvoed" style="width: 100%; height: auto;">
     <p style="color: #7f8c8d; font-size: 11px;">
-      <em>Figure: Custom body design – isometric view</em>
+      <em>Figure: Body CAD Back View, Top Plate Remvoed</em>
     </p>
   </div>
 </div>
@@ -946,7 +946,7 @@ y = r × sin(θ)</pre>
   <img 
     src="images/foot.png" 
     alt="TPU Feet with Gorilla Tape"
-    style="height: auto;"
+    style="width: 60%; height: auto;"
   >
   <p style="color: #7f8c8d; font-size: 11px;">
     <em>Figure: TPU feet with Gorilla tape applied for improved traction</em>
@@ -966,145 +966,189 @@ y = r × sin(θ)</pre>
     <p><strong>Assembly Notes:</strong> The servos are positional. When first setting up the legs, you must not attach the servo horns. The <code>setup_servos()</code> command must be uncommented in main and then the servos should be attached to each joint via the servo horns and set screws once that program is running. This ensures that each joint is in the position it thinks it is in.</p>
 
     <h3>Bill of Materials</h3>
-    <table>
-        <tr>
-            <th>Component</th>
-            <th>Description</th>
-            <th>Quantity</th>
-            <th>Cost (USD)</th>
-            <th>Source</th>
-        </tr>
-        <tr>
-            <td colspan="5" style="background-color: #e8e8e8; font-weight: bold;">Electronics</td>
-        </tr>
-        <tr>
-            <td>Raspberry Pi Pico W</td>
-            <td>Main microcontroller</td>
-            <td>1</td>
-            <td>$7.00</td>
-            <td><a href="https://www.raspberrypi.com/products/raspberry-pi-pico/" target="_blank">Raspberry Pi</a></td>
-        </tr>
-        <tr>
-            <td>MG90S Servos</td>
-            <td>Leg actuation servos</td>
-            <td>12 (16-pack)</td>
-            <td>$28.99</td>
-            <td><a href="https://www.amazon.com" target="_blank">Amazon</a></td>
-        </tr>
-        <tr>
-            <td>Adafruit PCA9685</td>
-            <td>16-Channel 12-bit PWM/Servo Driver</td>
-            <td>1</td>
-            <td>$14.95</td>
-            <td><a href="https://www.adafruit.com/product/815" target="_blank">Adafruit</a></td>
-        </tr>
-        <tr>
-            <td>MPU6050 IMU</td>
-            <td>6-axis gyroscope + accelerometer</td>
-            <td>1 (3-pack)</td>
-            <td>$9.59</td>
-            <td><a href="https://www.amazon.com" target="_blank">Amazon</a></td>
-        </tr>
-        <tr>
-            <td>MLX90614</td>
-            <td>Non-contact IR temperature sensor</td>
-            <td>1</td>
-            <td>$11.99</td>
-            <td><a href="https://www.amazon.com" target="_blank">Amazon</a></td>
-        </tr>
-        <tr>
-            <td>TF-Luna LiDAR</td>
-            <td>ToF distance sensor 0.2-8m range</td>
-            <td>1</td>
-            <td>$23.37</td>
-            <td><a href="https://www.amazon.com" target="_blank">Amazon</a></td>
-        </tr>
-        <tr>
-            <td>5V Power Supply</td>
-            <td>Bench power supply (2.5A)</td>
-            <td>1</td>
-            <td>N/A</td>
-            <td>Lab equipment</td>
-        </tr>
-        <tr>
-            <td>Jumper Wires</td>
-            <td>Breadboard connections</td>
-            <td>Assorted</td>
-            <td>N/A</td>
-            <td>Lab</td>
-        </tr>
-        <tr>
-            <td colspan="5" style="background-color: #e8e8e8; font-weight: bold;">Mechanical Components</td>
-        </tr>
-        <tr>
-            <td>PLA Filament</td>
-            <td>3D printed frame and legs</td>
-            <td>~200g</td>
-            <td>~$1.00</td>
-            <td>Engineering</td>
-        </tr>
-        <tr>
-            <td>TPU Filament</td>
-            <td>Flexible feet material</td>
-            <td>~50g</td>
-            <td>~$1.00</td>
-            <td>Engineering</td>
-        </tr>
-        <tr>
-            <td>M4 Heat Set Inserts</td>
-            <td>Leg joint fasteners</td>
-            <td>24</td>
-            <td>~$2.00</td>
-            <td>Engineering</td>
-        </tr>
-        <tr>
-            <td>M4 Screws</td>
-            <td>Leg joint assembly</td>
-            <td>24</td>
-            <td>~$3.00</td>
-            <td>Engineering</td>
-        </tr>
-        <tr>
-            <td>M2.5 Heat Set Inserts</td>
-            <td>Body/electronics mounting</td>
-            <td>14</td>
-            <td>~$2.00</td>
-            <td>Engineering</td>
-        </tr>
-        <tr>
-            <td>M2.5 Screws</td>
-            <td>Body/electronics mounting</td>
-            <td>14</td>
-            <td>~$2.00</td>
-            <td>Engineering</td>
-        </tr>
-        <tr>
-            <td>Zip Ties</td>
-            <td>Cable management</td>
-            <td>Assorted</td>
-            <td>~$1.00</td>
-            <td>Lab</td>
-        </tr>
-        <tr>
-            <td>Rubber Bands</td>
-            <td>Joint reinforcement</td>
-            <td>~10</td>
-            <td>~$1.00</td>
-            <td>Lab</td>
-        </tr>
-        <tr>
-            <td>Gorilla Tape</td>
-            <td>Foot grip enhancement</td>
-            <td>1 roll</td>
-            <td>~$2.00</td>
-            <td>Engineering</td>
-        </tr>
-        <tr style="font-weight: bold;">
-            <td colspan="3">Total Estimated Cost</td>
-            <td>~$111</td>
-            <td></td>
-        </tr>
-    </table>
+<table>
+    <tr>
+        <th>Component</th>
+        <th>Description</th>
+        <th>Quantity</th>
+        <th>Cost (USD)</th>
+        <th>Source</th>
+    </tr>
+
+    <tr>
+        <td colspan="5" style="background-color: #e8e8e8; font-weight: bold;">Electronics</td>
+    </tr>
+
+    <tr>
+        <td>Raspberry Pi Pico W</td>
+        <td>Main microcontroller with WiFi</td>
+        <td>1</td>
+        <td>$7.00</td>
+        <td>
+            <a href="https://www.raspberrypi.com/products/raspberry-pi-pico/" target="_blank">
+                Raspberry Pi
+            </a>
+        </td>
+    </tr>
+
+    <tr>
+        <td>MG90S Servos</td>
+        <td>Metal gear micro servos for leg actuation</td>
+        <td>12 (16-pack)</td>
+        <td>$28.99</td>
+        <td>
+            <a href="https://www.amazon.com/Hanaive-Motors-Helicopter-Airplane-Control/dp/B0D13SL79N" target="_blank">
+                Amazon
+            </a>
+        </td>
+    </tr>
+
+    <tr>
+        <td>Adafruit PCA9685</td>
+        <td>16-channel 12-bit PWM servo driver</td>
+        <td>1</td>
+        <td>$14.95</td>
+        <td>
+            <a href="https://www.adafruit.com/product/815" target="_blank">
+                Adafruit
+            </a>
+        </td>
+    </tr>
+
+    <tr>
+        <td>MPU6050 IMU</td>
+        <td>6-axis accelerometer and gyroscope</td>
+        <td>1</td>
+        <td>$9.59</td>
+        <td>
+            <a href="https://www.amazon.com/EC-Buying-Accelerometer-Gyroscope-Module16-Bit/dp/B0B3D6D1KD" target="_blank">
+                Amazon
+            </a>
+        </td>
+    </tr>
+
+    <tr>
+        <td>MLX90614</td>
+        <td>Non-contact infrared temperature sensor</td>
+        <td>1</td>
+        <td>$11.99</td>
+        <td>
+            <a href="https://www.amazon.com/Teyleten-Robot-MLX90614-MLX90614ESF-Temperature/dp/B0CLDGFQYS" target="_blank">
+                Amazon
+            </a>
+        </td>
+    </tr>
+
+    <tr>
+        <td>TF-Luna LiDAR</td>
+        <td>Time-of-flight distance sensor (0.2–8 m)</td>
+        <td>1</td>
+        <td>$23.37</td>
+        <td>
+            <a href="https://www.amazon.com/Single-Point-Compatible-Rasppbarry-Communication-Interface/dp/B088NVX2L7" target="_blank">
+                Amazon
+            </a>
+        </td>
+    </tr>
+
+    <tr>
+        <td>5V Power Supply</td>
+        <td>Bench power supply (2.5 A)</td>
+        <td>1</td>
+        <td>N/A</td>
+        <td>Lab equipment</td>
+    </tr>
+
+    <tr>
+        <td>Jumper Wires</td>
+        <td>Breadboard connections</td>
+        <td>Assorted</td>
+        <td>N/A</td>
+        <td>Lab</td>
+    </tr>
+
+    <tr>
+        <td colspan="5" style="background-color: #e8e8e8; font-weight: bold;">Mechanical Components</td>
+    </tr>
+
+    <tr>
+        <td>PLA Filament</td>
+        <td>3D printed body and leg structures</td>
+        <td>~200 g</td>
+        <td>~$1.00</td>
+        <td>Engineering</td>
+    </tr>
+
+    <tr>
+        <td>TPU Filament</td>
+        <td>Flexible feet material</td>
+        <td>~50 g</td>
+        <td>~$1.00</td>
+        <td>Engineering</td>
+    </tr>
+
+    <tr>
+        <td>M4 Heat-Set Inserts</td>
+        <td>Leg mounting hardware</td>
+        <td>24</td>
+        <td>~$2.00</td>
+        <td>Engineering</td>
+    </tr>
+
+    <tr>
+        <td>M4 Screws</td>
+        <td>Leg assembly fasteners</td>
+        <td>24</td>
+        <td>~$3.00</td>
+        <td>Engineering</td>
+    </tr>
+
+    <tr>
+        <td>M2.5 Heat-Set Inserts</td>
+        <td>Electronics mounting hardware</td>
+        <td>14</td>
+        <td>~$2.00</td>
+        <td>Engineering</td>
+    </tr>
+
+    <tr>
+        <td>M2.5 Screws</td>
+        <td>Electronics mounting fasteners</td>
+        <td>14</td>
+        <td>~$2.00</td>
+        <td>Engineering</td>
+    </tr>
+
+    <tr>
+        <td>Zip Ties</td>
+        <td>Cable management</td>
+        <td>Assorted</td>
+        <td>~$1.00</td>
+        <td>Lab</td>
+    </tr>
+
+    <tr>
+        <td>Rubber Bands</td>
+        <td>Joint reinforcement</td>
+        <td>~10</td>
+        <td>~$1.00</td>
+        <td>Lab</td>
+    </tr>
+
+    <tr>
+        <td>Gorilla Tape</td>
+        <td>Foot traction enhancement</td>
+        <td>1 roll</td>
+        <td>~$2.00</td>
+        <td>Engineering</td>
+    </tr>
+
+    <tr style="font-weight: bold;">
+        <td colspan="3">Total Estimated Cost</td>
+        <td>~$111</td>
+        <td></td>
+    </tr>
+</table>
 
     <h3>Things That Didn't Work</h3>
     <ul>
