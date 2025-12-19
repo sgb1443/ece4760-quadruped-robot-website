@@ -1436,49 +1436,7 @@ static err_t tcp_server_recv(void *arg, struct tcp_pcb *tpcb,
 // ... [Additional functions]
 // See complete listings in GitHub repository</pre>
 
-    <h4>plot_sweep_csv.py</h4>
-    <pre># Python visualization script for environmental mapping
-# Generates polar and Cartesian plots with thermal overlay
-
-import csv
-import math
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from matplotlib.colors import Normalize
-
-def plot_sweep(angles, distances, temps):
-    # Convert to radians for polar plot
-    theta_rad = [math.radians(a) for a in angles]
-    
-    # Convert to Celsius to Fahrenheit
-    temps_f = [(t * 9/5) + 32 for t in temps]
-    
-    # Normalize color scale
-    norm = Normalize(vmin=min(temps_f), vmax=max(temps_f))
-    
-    # Create figure with polar and Cartesian subplots
-    fig = plt.figure(figsize=(14, 6))
-    
-    # Polar plot
-    ax_polar = fig.add_subplot(121, projection='polar')
-    ax_polar.scatter(theta_rad, distances, c=temps_f, 
-                     cmap=cm.plasma, norm=norm, s=10)
-    ax_polar.set_theta_zero_location("N")
-    ax_polar.set_theta_direction(1)
-    
-    # Cartesian plot
-    ax_cart = fig.add_subplot(122)
-    x = [r * math.cos(t) for r, t in zip(distances, theta_rad)]
-    y = [r * math.sin(t) for r, t in zip(distances, theta_rad)]
-    ax_cart.scatter(x, y, c=temps_f, cmap=cm.plasma, norm=norm, s=10)
-    
-    plt.show()
-
-# ... [Additional code]
-# See complete listings in GitHub repository</pre>
-
-  
-    <h3>Appendix C: Hardware Schematics</h3>
+  <h3>Appendix C: Hardware Schematics</h3>
     <div style="text-align: center;">
   <img 
     src="images/circuit2.png" 
