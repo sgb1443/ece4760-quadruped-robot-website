@@ -304,22 +304,36 @@
                 <h2 id="summary">Summary</h2>
                 <p>We designed and built a 12 degree-of-freedom (3 servos per leg × 4 legs) quadruped robot controlled by a Raspberry Pi Pico W, featuring integrated environmental sensing and a wireless WiFi controller. Starting from a custom CAD body and 3D-printed frame, the robot combines mechanical engineering and embedded electrical engineering to create a platform capable of coordinated four-legged locomotion, heading determination, environmental mapping, and target detection. In order to do so, our system leverages several sensors including an IMU, a solid state LiDAR sensor, and a contact-less infrared sensor.</p>
 
-                <img src="images/robot_assembled.jpg" alt="Assembled Quadruped Robot">
-                <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 1: Assembled quadruped robot with sensor array</em></p>
-
                 <h2 id="what-we-did">What We Did</h2>
                 <p>Our project implements a fully functional walking robot with the following key features:</p>
 
                 <h3>Mechanical Design</h3>
                 <p>We created a custom 3D-printed body and leg assemblies optimized for our specific servo operation requirements and sensor placement. After encountering flexibility issues with initial prints due to insufficient infill, we redesigned the frame to provide rigid mounting points for all four legs and the twelve MG90S servos while accommodating the electronics and wiring on the body through implementing a 2-layer mounting system, enclosing all of the servo cables. The design includes TPU grippy feet for improved traction and stability. The leg files are based off an <a href="https://www.instructables.com/3D-Printed-Raspberry-Pi-Spider-Robot-Platform/" target="_blank">existing online design</a>, but the attachment to the body and the body itself is all custom to allow for mounting of the Raspberry Pi and sensors.</p>
 
-                <img src="images/full_cad.png" alt="CAD Body Design">
-                <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 2: Custom body CAD design </em></p>
+                <div style="text-align: center;">
+  <img 
+    src="images/full_cad.png" 
+    alt="CAD Body Design"
+    style="width: 60%; height: auto;"
+  >
+  <p style="color: #7f8c8d; font-size: 11px;">
+    <em>Figure 2: Custom body CAD design</em>
+  </p>
+</div>
 
 
 
-                <img src="images/assem.png" alt="Full Assembly">
-                <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 5: Complete Robot Assembly</em></p>
+              <div style="text-align: center;">
+  <img 
+    src="images/assem.png" 
+    alt="Full Assembly"
+    style="width: 60%; height: auto;"
+  >
+  <p style="color: #7f8c8d; font-size: 11px;">
+    <em>Figure 5: Complete Robot Assembly</em>
+  </p>
+</div>
+
 
                 <h3>Locomotion System</h3>
                 <p>Twelve servos provide three degrees of freedom per leg (joint rotation, thigh angle, and calf angle), controlled via an Adafruit PCA9685 16-channel PWM driver over I2C. We implemented coordinated gait patterns that enable the robot to walk forward, backward, turn in place, and complete fun gestures such as waving, squatting, and shuffling. We took initial servo positions and control sequences for these movements from a <a href="https://github.com/ConnorLynaugh/Digital-Design-with-Micro-Controllers" target="_blank">Python library</a> and adapted them for C.</p>
@@ -332,14 +346,32 @@
                     <li><strong>MLX90614 infrared temperature sensor</strong> for heat signature detection and thermal mapping (effective range ~1m for human-sized targets)</li>
                 </ul>
 
-                <img src="images/circuit2.png" alt="System Wiring Diagram">
-                <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 6: Complete system wiring diagram</em></p>
+            <div style="text-align: center;">
+  <img 
+    src="images/circuit2.png" 
+    alt="System Wiring Diagram"
+    style="width: 60%; height: auto;"
+  >
+  <p style="color: #7f8c8d; font-size: 11px;">
+    <em>Figure 6: Complete system wiring diagram</em>
+  </p>
+</div>
+
 
                 <h3>Wireless Control</h3>
                 <p>A WiFi-based control interface allows real-time command and control from a computer or mobile device on the local network (we used an iPad), enabling remote operation and monitoring of the robot's sensor data.</p>
 
-                 <img src="images/control.png" alt="Wifi Controller Interface">
-                <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 7: Wifi Controller Interface</em></p>
+               <div style="text-align: center;">
+  <img 
+    src="images/control.png" 
+    alt="Wifi Controller Interface"
+    style="width: 60%; height: auto;"
+  >
+  <p style="color: #7f8c8d; font-size: 11px;">
+    <em>Figure 7: Wifi Controller Interface</em>
+  </p>
+</div>
+
                 
                 <h2 id="why">Why We Built This</h2>
                 <p>We wanted to create a robot that truly interacts with the world around it. Rather than building a machine that simply responds to pre-programmed commands, we set out to design a sensing platform that could perceive, understand, and navigate complex environments autonomously while moving in a unique and challenging way. The platform we built has the potential to execute various autonomous missions with different sensor-driven objectives.</p>
@@ -509,9 +541,16 @@ This coordinate convention places 0° directly in front of the robot and produce
 intuitive top-down environmental map.
 </p>
 
-          <img src="images/polarmap.png" alt="Envirionmental Map">
-                <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 8: Environmetal Map from Robot Sensor Data</em></p>
-                
+       <div style="text-align: center;">
+  <img 
+    src="images/polarmap.png" 
+    alt="Environmental Map"
+    style="width: 70%; height: auto;"
+  >
+  <p style="color: #7f8c8d; font-size: 11px;">
+    <em>Figure 8: Environmental Map from Robot Sensor Data</em>
+  </p>
+</div>
 
               
 
@@ -644,8 +683,29 @@ plot_sweep_csv.py        - CSV plotting utility</pre>
 
     <p>The primary difficulty regarding software revolved around successfully implementing our WiFi access point. At first we had mistakenly implemented Bluetooth control, but quickly realized that this was beyond the usable scope of our wireless controller as we had envisioned (Bluetooth would be better suited for inter-Raspberry Pi communication). We followed Bruce Land's source code and were quickly able to get the example LED code running, but adding any new complexity to the page itself quickly crashed our interface, producing our error page repeatedly. With minimal debugging capability, this proved to be the greatest difficulty, though it was eventually achieved.</p>
 
-    <img src="images/wiring_diagram.png" alt="Complete System Wiring Diagram">
-    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Complete system wiring diagram showing all connections</em></p>
+  <div style="text-align: center;">
+  <img 
+    src="images/circuit2.png" 
+    alt="System Wiring Diagram"
+    style="width: 60%; height: auto;"
+  >
+  <p style="color: #7f8c8d; font-size: 11px;">
+    <em>Figure 6: Complete system wiring diagram</em>
+  </p>
+</div>
+
+          <div style="text-align: center;">
+  <img 
+    src="images/wiringview.png" 
+    alt="System Wiring Diagram"
+    style="width: 60%; height: auto;"
+  >
+  <p style="color: #7f8c8d; font-size: 11px;">
+    <em>Figure 6: Complete system wiring on the Robot</em>
+  </p>
+</div>
+
+        
 
     <h3>Servo Driver</h3>
     <p>Our servo driver provides low-level servo control through hardcoded poses composed of individual servo assignments. The RP2040 communicates with a 16-channel PWM IC (PCA9685) over I2C to offload PWM generation to dedicated hardware, simplifying port management by freeing up PWM pins and simplifying timing constraints since the Raspberry Pi Pico is primarily occupied with WiFi updates, sensor reads, and program control.</p>
@@ -678,8 +738,17 @@ void forward(void) {
 
     <p>The Pico W's initialization library starts up the on-chip CYW43 driver which configures the WiFi credentials and launches the networking stack including DHCP and DNS services. A TCP server handler manages incoming connections, prompting communication between the robot and the client controller. Sensor data such as heading, distance, and temperature are all transmitted to the controller at 10Hz. On the other side, over 15 buttons control robot movements and actions.</p>
 
-    <img src="images/wifi_interface.png" alt="WiFi Control Interface">
-    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: WiFi control interface showing sensor telemetry and control buttons</em></p>
+<div style="text-align: center;">
+  <img 
+    src="images/control.png" 
+    alt="Wifi Controller Interface"
+    style="width: 60%; height: auto;"
+  >
+  <p style="color: #7f8c8d; font-size: 11px;">
+    <em>Figure 7: Wifi Controller Interface</em>
+  </p>
+</div>
+
 
     <p>The webpage itself is implemented directly as an HTTP server using TCP callbacks, in which each GET request is parsed and organized to a given endpoint such as <code>/sensors</code>, <code>/cmd</code>, and <code>/map</code>. The sensor endpoint features validity flags for each printed value so that in the case of disconnected sensors the controller will read "--" for missing values. If the lwIP send-buffer is not available before sending large messages, the transmission will not be executed in order to prevent data loss or corruption.</p>
 
@@ -766,26 +835,63 @@ y = r × sin(θ)</pre>
 
     <p>At this point, the robot begins moving <code>forward()</code>, approaching the hot object. Only once the object is detected using the LiDAR at less than 10 cm away, the robot will halt and say hello using the <code>hi()</code> function. Throughout the entire thermal sweep process, motion commands are blocking, but background servicing remains active through cooperative scheduling.</p>
 
-    <h3 id="hardware">Mechanical Design</h3>
-    <img src="images/full_cad.png" alt="Full CAD Assembly - Top View">
-<p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Complete CAD assembly - top view showing all components</em></p>
+ <div style="text-align: center;">
+  <img 
+    src="images/polarmap.png" 
+    alt="Environmental Map"
+    style="width: 70%; height: auto;"
+  >
+  <p style="color: #7f8c8d; font-size: 11px;">
+    <em>Figure 8: Environmental Map from Robot Sensor Data</em>
+  </p>
+</div>
 
-<img src="images/fullcadbackview.png" alt="Full CAD Assembly - Back View">
-<p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Complete CAD assembly - rear view</em></p>
+    <h3 id="hardware">Mechanical Design</h3>
+<div style="display: flex; justify-content: center; gap: 20px;">
+  <div style="text-align: center; width: 45%;">
+    <img 
+      src="images/full_cad.png" 
+      alt="Full CAD Assembly Front View"
+      style="width: 100%; height: auto;"
+    >
+    <p style="color: #7f8c8d; font-size: 11px;">
+      <em>Figure: x Full CAD Assembly Front View</em>
+    </p>
+  </div>
+
+  <div style="text-align: center; width: 45%;">
+    <img 
+      src="images/fullcadbackview.png" 
+      alt="Full CAD Assembly - Back View"
+      style="width: 100%; height: auto;"
+    >
+    <p style="color: #7f8c8d; font-size: 11px;">
+      <em>Figure: x Full CAD Assembly Back View</em>
+    </p>
+  </div>
+</div>
 
     <h4>Custom Body Design</h4>
     <p>The robot's body is a completely custom design created in CAD to address the specific requirements of our sensor suite and electronics layout. Unlike the legs, which were adapted from an existing open-source design, the body was designed from scratch to provide optimal mounting for the Raspberry Pi Pico W, sensor array, and power distribution system.</p>
 <img src="images/bodycad.png" alt="Custom Body CAD Design">
 <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Custom body CAD design showing 2-layer mounting system</em></p>
         
-    <img src="images/cad_body_top.png" alt="Body CAD - Top View">
-    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Custom body design - top view</em></p>
+<div style="display: flex; justify-content: center; gap: 20px;">
+  <div style="text-align: center; width: 45%;">
+    <img src="images/bodyfront.png" alt="Body CAD Front View" style="width: 100%; height: auto;">
+    <p style="color: #7f8c8d; font-size: 11px;">
+      <em>Figure: Custom body design – top view</em>
+    </p>
+  </div>
 
-    <img src="images/cad_body_iso.png" alt="Body CAD - Isometric View">
-    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Custom body design - isometric view</em></p>
-
-    <img src="images/robot_body_assembled.jpg" alt="Assembled Robot Body">
-    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Assembled robot body showing component placement</em></p>
+  <div style="text-align: center; width: 45%;">
+    <img src="images/bodyback.png" alt="Body CAD Back View, Top Plate Remvoed" style="width: 100%; height: auto;">
+    <p style="color: #7f8c8d; font-size: 11px;">
+      <em>Figure: Custom body design – isometric view</em>
+    </p>
+  </div>
+</div>
+   
 
     <p><strong>Key Design Features:</strong></p>
     <p>The body implements a 2-layer mounting system that separates the servo driver and servo wiring (lower layer) from the microcontroller (upper layer) and sensors (front plate). This vertical stacking approach minimizes the robot's footprint while providing organized cable management. All servo cables route through internal channels and are enclosed within the body structure, preventing them from interfering with leg motion or snagging during operation.</p>
@@ -797,11 +903,10 @@ y = r × sin(θ)</pre>
     <h4>Leg Design and Assembly</h4>
     <p>The leg design was adapted from an open-source 3D-printed quadruped (see Appendix D for complete source listing). Each leg consists of three segments (joint, thigh, calf) providing three degrees of freedom per leg, for a total of 12 DOF across the robot.</p>
 
-    <img src="images/cad_assembly_top.png" alt="Full Assembly - Top View">
+    <img src="images/leg.png" alt="Leg Assembly">
     <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Complete robot assembly - top view</em></p>
 
-    <img src="images/cad_assembly_iso.png" alt="Full Assembly - Isometric View">
-    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Complete robot assembly - isometric view</em></p>
+    
 
     <p><strong>Leg Kinematics:</strong></p>
     <p>Each leg features:</p>
@@ -815,7 +920,7 @@ y = r × sin(θ)</pre>
     <p><strong>Foot Design:</strong></p>
     <p>The original design specified TPU (thermoplastic polyurethane) feet for their flexibility and grip properties. While TPU provided some cushioning, it proved less grippy than expected on smooth surfaces. Gorilla tape was applied to the bottom of each foot to enhance traction, which dramatically improved walking stability and prevented slipping during turns.</p>
 
-    <img src="images/robot_feet.jpg" alt="TPU Feet with Gorilla Tape">
+    <img src="images/foot.png" alt="TPU Feet with Gorilla Tape">
     <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: TPU feet with Gorilla tape applied for improved traction</em></p>
 
     <h4>Design Iterations</h4>
@@ -828,7 +933,7 @@ y = r × sin(θ)</pre>
 
     <p>The final assembled robot measures approximately 30cm × 30cm × 5cm (L × W × H) when splayed into the neutral X-position.</p>
 
-    <p><strong>Assembly Notes:</strong> The servos are positional. When first setting up the legs, you must not attach the servo horns. The <code>setup_servos()</code> command must be uncommented in main and then the servos should be attached to each joint once that program is running. This ensures that each joint is in the position it thinks it is in.</p>
+    <p><strong>Assembly Notes:</strong> The servos are positional. When first setting up the legs, you must not attach the servo horns. The <code>setup_servos()</code> command must be uncommented in main and then the servos should be attached to each joint via the servo horns and set screws once that program is running. This ensures that each joint is in the position it thinks it is in.</p>
 
     <h3>Bill of Materials</h3>
     <table>
@@ -978,15 +1083,16 @@ y = r × sin(θ)</pre>
         <li><strong>Blown servo driver boards:</strong> We (Sarah Grace, oops) blew multiple PCA9685 servo boards by connecting V+ and VCC flipped. This was a costly learning experience about double-checking power connections!</li>
     </ul>
 
-    <h3>AI Usage</h3>
-    <p>We used AI tools extensively throughout the project for debugging and code translation:</p>
-    <ul>
-        <li>Debugging C code when encountering I2C communication errors and timing issues</li>
-        <li>Helping transcribe the original Python movement library to C code, adapting the structure for our servo channel mapping</li>
-        <li>Assisting with sensor .c and .h file creation and cross-checking against datasheets to ensure correct register addresses and I2C protocols</li>
-        <li>Suggesting the exponential smoothing filter approach for IMU heading, which proved very effective</li>
-        <li>Helping troubleshoot WiFi connectivity issues and TCP buffer management</li>
-    </ul>
+   <h3>AI Usage</h3>
+<p>We used AI tools extensively throughout the project for debugging:</p>
+<ul>
+    <li>Debugging C code when encountering I2C communication errors and timing issues</li>
+    <li>Helping transcribe the original Python movement library to C code, adapting the structure for our servo channel mapping</li>
+    <li>Assisting with sensor .c and .h file creation and cross-checking against datasheets to ensure correct register addresses and I2C protocols</li>
+    <li>Suggesting the exponential smoothing filter approach for IMU heading, which proved very effective</li>
+    <li>Helping troubleshoot WiFi connectivity issues and TCP buffer management</li>
+    <li>Helping format our final report into HTML for this website</li>
+</ul>
 </section>
 
 <!-- Results section from previous response -->
