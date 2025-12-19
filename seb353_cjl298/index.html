@@ -873,8 +873,7 @@ y = r × sin(θ)</pre>
 
     <h4>Custom Body Design</h4>
     <p>The robot's body is a completely custom design created in CAD to address the specific requirements of our sensor suite and electronics layout. Unlike the legs, which were adapted from an existing open-source design, the body was designed from scratch to provide optimal mounting for the Raspberry Pi Pico W, sensor array, and power distribution system.</p>
-<img src="images/bodycad.png" alt="Custom Body CAD Design">
-<p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Custom body CAD design showing 2-layer mounting system</em></p>
+
         
 <div style="display: flex; justify-content: center; gap: 20px;">
   <div style="text-align: center; width: 45%;">
@@ -903,8 +902,16 @@ y = r × sin(θ)</pre>
     <h4>Leg Design and Assembly</h4>
     <p>The leg design was adapted from an open-source 3D-printed quadruped (see Appendix D for complete source listing). Each leg consists of three segments (joint, thigh, calf) providing three degrees of freedom per leg, for a total of 12 DOF across the robot.</p>
 
-    <img src="images/leg.png" alt="Leg Assembly">
-    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Complete robot assembly - top view</em></p>
+<div style="text-align: center;">
+  <img 
+    src="images/leg.png" 
+    alt="Leg Assembly"
+    style="width: 25%; height: auto;"
+  >
+  <p style="color: #7f8c8d; font-size: 11px;">
+    <em>Figure: Complete robot assembly – top view</em>
+  </p>
+</div>
 
     
 
@@ -920,8 +927,16 @@ y = r × sin(θ)</pre>
     <p><strong>Foot Design:</strong></p>
     <p>The original design specified TPU (thermoplastic polyurethane) feet for their flexibility and grip properties. While TPU provided some cushioning, it proved less grippy than expected on smooth surfaces. Gorilla tape was applied to the bottom of each foot to enhance traction, which dramatically improved walking stability and prevented slipping during turns.</p>
 
-    <img src="images/foot.png" alt="TPU Feet with Gorilla Tape">
-    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: TPU feet with Gorilla tape applied for improved traction</em></p>
+   <div style="text-align: center;">
+  <img 
+    src="images/foot.png" 
+    alt="TPU Feet with Gorilla Tape"
+    style="height: auto;"
+  >
+  <p style="color: #7f8c8d; font-size: 11px;">
+    <em>Figure: TPU feet with Gorilla tape applied for improved traction</em>
+  </p>
+</div>
 
     <h4>Design Iterations</h4>
     <p>The initial body print exhibited excessive flexibility due to insufficient infill percentage, causing motion quality issues as the frame flexed under servo loads. The design was revised with increased wall thickness and infill along with thicker dimensions (the base plate is now 3mm), providing the necessary rigidity. The leg attachment points were also reinforced with thicker printing settings. Print settings were optimized for a Bambu X1C printer.</p>
@@ -1103,14 +1118,19 @@ y = r × sin(θ)</pre>
     <h4>Environmental Mapping</h4>
     <p>The mapping system successfully captured detailed environmental profiles combining distance and temperature data. The polar coordinate plots clearly show obstacles detected by the LiDAR and thermal signatures identified by the IR sensor. The square shape of the cardboard barrier enclosure is clearly visible in the resulting map data, demonstrating accurate spatial reconstruction from our sensor fusion approach. We placed hot and cold beverages in each corner of the mapped area to clearly demonstrate the system's thermal detection capabilities and spatial accuracy.</p>
 
-    <img src="images/mapping_polar_cartesian.png" alt="Environmental Scan Results">
-    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Environmental mapping results showing polar (left) and Cartesian (right) views with thermal overlay. Hot and cold beverages placed in corners are clearly distinguishable by temperature.</em></p>
-
-    <img src="images/physical_setup.jpg" alt="Physical Environment">
+   <div style="text-align: center;">
+  <img 
+    src="images/polarmap.png" 
+    alt="Environmental Map"
+    style="width: 70%; height: auto;"
+  >
+  <p style="color: #7f8c8d; font-size: 11px;">
+    <em>Figure 8: Environmental Map from Robot Sensor Data</em>
+  </p>
+</div>
+    <img src="images/environ.pmg" alt="Physical Environment">
     <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Physical test environment showing cardboard barrier setup and beverage placement</em></p>
 
-    <img src="images/comparison_physical_map.jpg" alt="Physical vs Map Comparison">
-    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Side-by-side comparison of physical environment layout and corresponding map visualization, confirming spatial accuracy</em></p>
 
     <p><em>Video demonstrations:</em></p>
     <ul>
@@ -1118,6 +1138,45 @@ y = r × sin(θ)</pre>
         <li>Thermal target identification and autonomous approach behavior</li>
         <li>WiFi control interface demonstration with real-time telemetry</li>
     </ul>
+    <div style="display: flex; justify-content: center; margin: 20px 0;">
+  <iframe
+    width="640"
+    height="360"
+    src="https://www.youtube.com/embed/UDd_kxl1mZw"
+    title="Quadruped Robot Demo"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen>
+  </iframe>
+</div>
+
+      <p><em>Video of Temperature Readings:</em></p>
+    <div style="display: flex; justify-content: center; margin: 20px 0;">
+  <iframe
+    width="360"
+    height="640"
+    src="https://www.youtube.com/embed/nMtbIpu7W2s"
+    title="Quadruped Robot Shorts"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen>
+  </iframe>
+</div>
+      <p><em>Scanning Clip:></p>
+    <div style="display: flex; justify-content: center; margin: 20px 0;">
+  <iframe
+    width="360"
+    height="640"
+    src="https://www.youtube.com/embed/N0M8TC0sx4Y"
+    title="Quadruped Robot Shorts"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen>
+  </iframe>
+</div>
+
+
+
 
     <h3 id="speed">Speed of Execution and Responsiveness</h3>
     <p>The robot demonstrated minimal hesitation during operation and worked as expected. Movement commands from the WiFi controller were executed immediately with no perceptible lag. The cooperative multitasking implementation successfully maintained sensor updates during movement sequences without causing motion stuttering or interruption. The 360-degree mapping sweep collected samples at approximately 100 Hz while simultaneously rotating and updating heading calculations, demonstrating effective concurrency on the single-core Pico W. Serial command processing responded instantly to user input. The web interface updated sensor telemetry smoothly without affecting movement control performance.</p>
@@ -1131,9 +1190,17 @@ y = r × sin(θ)</pre>
     <h3 id="usability">Usability</h3>
     <p>The robot proved highly usable for both our team and outside users. The WiFi control interface provides intuitive operation as users simply connect to the "quadruped_ap" WiFi network (password: "password") and navigate to the robot's IP address in any web browser. No software installation or configuration is required. The interface presents clearly labeled buttons for all movement commands with real-time sensor readings displayed. We successfully demonstrated the robot to classmates who controlled it immediately without instruction. The serial terminal interface provides advanced functionality for users comfortable with command-line interaction. Setup time is minimal - plug in power, wait for WiFi to initialize (~10 seconds), and connect. The robot's portable form factor and robust construction allowed easy transport between testing locations and graceful recovery from tip-overs during testing.</p>
 
-    <img src="images/wifi_interface.png" alt="WiFi Control Interface">
-    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: WiFi control interface showing intuitive button layout and real-time sensor telemetry</em></p>
-</section>
+<div style="text-align: center;">
+  <img 
+    src="images/control.png" 
+    alt="Wifi Controller Interface"
+    style="width: 60%; height: auto;"
+  >
+  <p style="color: #7f8c8d; font-size: 11px;">
+    <em>Figure 7: WiFi Controller Interface</em>
+  </p>
+</div>
+
 
 <section id="conclusions">
     <h2>Conclusions</h2>
@@ -1187,14 +1254,19 @@ y = r × sin(θ)</pre>
 
     <h3 id="permissions">Appendix A: Permissions</h3>
     <p><strong>Course Website Inclusion:</strong></p>
-    <p>"The group approves this report for inclusion on the course website."</p>
+    <p>The group approves this report for inclusion on the course website.</p>
     
     <p><strong>YouTube Channel Inclusion:</strong></p>
-    <p>"The group approves the video for inclusion on the course youtube channel."</p>
+    <p>The group approves the video for inclusion on the course youtube channel.</p>
 
     <h3>Appendix B: Program Listings</h3>
-    <p>Complete commented source code is available in our GitHub repository. Key files include:</p>
-
+   <p>
+  Complete commented source code is available in our GitHub repository:
+  <a href="https://github.com/ConnorJLynaugh/Digital-Design-with-Micro-Controllers" target="_blank">
+    https://github.com/ConnorJLynaugh/Digital-Design-with-Micro-Controllers
+  </a>
+</p>
+<p>Key files include:</p>
     <h4>main.c</h4>
     <pre>// Main control program
 // Handles initialization, cooperative scheduling, and state machines
@@ -1339,64 +1411,104 @@ def plot_sweep(angles, distances, temps):
 # ... [Additional code]
 # See complete listings in GitHub repository</pre>
 
-    <p>For complete source code with full comments and implementation details, please see our GitHub repository: <a href="https://github.com/ConnorLynaugh/Digital-Design-with-Micro-Controllers" target="_blank">https://github.com/ConnorLynaugh/Digital-Design-with-Micro-Controllers</a></p>
-
+  
     <h3>Appendix C: Hardware Schematics</h3>
-    <p>See Figure 6 in the Introduction section for the complete wiring diagram showing all I2C connections, power distribution, and signal routing.</p>
+    <div style="text-align: center;">
+  <img 
+    src="images/circuit2.png" 
+    alt="System Wiring Diagram"
+    style="width: 60%; height: auto;"
+  >
+  <p style="color: #7f8c8d; font-size: 11px;">
+    <em>Figure 6: Complete system wiring diagram</em>
+  </p>
+</div>
+<h3>Appendix D: References and Sources</h3>
 
-    <h3>Appendix D: References and Sources</h3>
-    
-    <h4>Design and Code Sources</h4>
-    <table>
-        <tr>
-            <th>Component</th>
-            <th>Source</th>
-            <th>License/Usage</th>
-        </tr>
-        <tr>
-            <td>Leg Geometry CAD</td>
-            <td><a href="https://www.instructables.com/3D-Printed-Raspberry-Pi-Spider-Robot-Platform/" target="_blank">Instructables Quadruped Platform</a></td>
-            <td>Creative Commons - Adapted for our body design</td>
-        </tr>
-        <tr>
-            <td>Movement Library Reference</td>
-            <td><a href="https://github.com/ConnorLynaugh/Digital-Design-with-Micro-Controllers" target="_blank">Python Quadruped Library</a></td>
-            <td>MIT License - Translated to C and adapted</td>
-        </tr>
-        <tr>
-            <td>MLX90614 Driver</td>
-            <td>Arduino MLX90614 Library (various GitHub sources)</td>
-            <td>Open Source - Translated from C++ to C</td>
-        </tr>
-        <tr>
-            <td>WiFi AP Implementation</td>
-            <td>Bruce Land's Pico W Examples</td>
-            <td>Educational use - Cornell ECE course materials</td>
-        </tr>
-        <tr>
-            <td>Raspberry Pi Pico SDK</td>
-            <td><a href="https://github.com/raspberrypi/pico-sdk" target="_blank">Official Pico SDK</a></td>
-            <td>BSD-3-Clause License</td>
-        </tr>
-    </table>
+<h4>Design and Code Sources</h4>
+<table>
+    <tr>
+        <th>Component</th>
+        <th>Source</th>
+        <th>License / Usage</th>
+    </tr>
+    <tr>
+        <td>Leg Geometry CAD & Movement Library</td>
+        <td>
+            <a href="https://www.instructables.com/3D-Printed-Raspberry-Pi-Spider-Robot-Platform/" target="_blank">
+                3D Printed Raspberry Pi Spider Robot Platform
+            </a>
+        </td>
+        <td>Creative Commons – Leg geometry and movement concepts adapted</td>
+    </tr>
+    <tr>
+        <td>MLX90614 / IR Sensor Code Reference</td>
+        <td>
+            <a href="https://github.com/adafruit/Adafruit_MLX90640" target="_blank">
+                Adafruit MLX90640 Library
+            </a>
+        </td>
+        <td>MIT License – Used as reference for infrared sensor communication</td>
+    </tr>
+    <tr>
+        <td>TF-Luna LiDAR Usage Reference</td>
+        <td>
+            <a href="https://dronebotworkshop.com/tf-luna-lidar/" target="_blank">
+                DroneBot Workshop TF-Luna LiDAR Guide
+            </a>
+        </td>
+        <td>Educational reference for LiDAR usage and testing</td>
+    </tr>
+    <tr>
+        <td>IMU Demo Code</td>
+        <td>
+            <a href="https://github.com/vha3/Hunter-Adams-RP2040-Demos" target="_blank">
+                Hunter Adams RP2040 IMU Demos
+            </a>
+        </td>
+        <td>Educational reference – IMU integration example</td>
+    </tr>
+    <tr>
+        <td>PCA9685 Code Reference</td>
+        <td>
+            <a href="https://github.com/Reinbert/pca9685/blob/master/src/pca9685.c" target="_blank">
+                PCA9685 Driver Reference
+            </a>
+        </td>
+        <td>Open source – Register-level implementation reference</td>
+    </tr>
+    <tr>
+        <td>WiFi Setup Reference</td>
+        <td>
+            <a href="https://vanhunteradams.com/Pico/UDP/Connecting.html" target="_blank">
+                Pico W WiFi Connection Guide
+            </a>
+        </td>
+        <td>Educational reference – WiFi access point setup</td>
+    </tr>
+</table>
 
-    <h4>Datasheets</h4>
-    <ul>
-        <li><strong>PCA9685:</strong> <a href="https://www.adafruit.com/product/815" target="_blank">Adafruit PCA9685 Product Page</a> - 16-channel PWM servo driver datasheet</li>
-        <li><strong>MPU6050:</strong> InvenSense MPU-6000/MPU-6050 Product Specification - Gyroscope and accelerometer register maps</li>
-        <li><strong>TF-Luna:</strong> Benewake TF-Luna LiDAR Datasheet - I2C protocol and distance measurement specifications</li>
-        <li><strong>MLX90614:</strong> Melexis MLX90614 Family Datasheet - Non-contact infrared thermometer specifications</li>
-        <li><strong>RP2040:</strong> <a href="https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf" target="_blank">RP2040 Microcontroller Datasheet</a></li>
-    </ul>
-
-    <h4>Background References</h4>
-    <ul>
-        <li>Quadruped gait patterns and kinematics - Various robotics papers and tutorials</li>
-        <li>I2C communication protocol - NXP I2C-bus specification</li>
-        <li>Gyroscope integration and drift compensation techniques</li>
-        <li>lwIP (Lightweight IP) TCP/IP stack documentation</li>
-        <li>Matplotlib polar plotting documentation for visualization</li>
-    </ul>
+<h4>Datasheets</h4>
+<ul>
+    <li>
+        <strong>MLX90614:</strong>
+        <a href="https://www.melexis.com/en/documents/documentation/datasheets/datasheet-mlx90614" target="_blank">
+            Melexis MLX90614 Infrared Thermometer Datasheet
+        </a>
+    </li>
+    <li>
+        <strong>TF-Luna:</strong>
+        <a href="https://files.seeedstudio.com/wiki/Grove-TF_Mini_LiDAR/res/SJ-PM-TF-Luna-A03-Product-Manual.pdf" target="_blank">
+            Benewake TF-Luna LiDAR Product Manual
+        </a>
+    </li>
+    <li>
+        <strong>PCA9685:</strong>
+        <a href="https://cdn-shop.adafruit.com/datasheets/PCA9685.pdf" target="_blank">
+            PCA9685 16-Channel PWM Driver Datasheet
+        </a>
+    </li>
+</ul>
 
     <h3>Appendix E: Task Distribution</h3>
     
