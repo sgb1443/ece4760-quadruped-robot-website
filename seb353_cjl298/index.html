@@ -636,11 +636,404 @@ plot_sweep_csv.py        - CSV plotting utility</pre>
                 <p>While quadruped locomotion and sensor fusion are extensively patented by companies like Boston Dynamics, our educational implementation uses different mechanisms (hobby servos vs. electric/hydraulic actuators), operates at smaller scale (30cm vs. 1m+ body length), and employs publicly known techniques (PWM control, I2C communication, gyro integration). As an educational project for ECE 4760 at Cornell University, we properly cite all external resources, and the integration work and software architecture represent our original engineering effort. No NDAs were required as all components were purchased through standard retail channels with publicly available documentation.</p>
             </section>
 
-            <!-- Additional sections would continue here -->
             <section id="program-hardware">
-                <h2>Program/Hardware Design</h2>
-                <p><em>[Content continues with detailed software/hardware implementation...]</em></p>
-            </section>
+    <h2>Program/Hardware Design</h2>
+
+    <h3 id="overview">Overview</h3>
+    <p>Given the ambitious nature of our project, a primary component of our software implementation is properly combining several embedded sensors so that our main processor (RP2040) can respond to the environment and relay information with our WiFi controller. The sensors used in our design, in the order in which they were implemented, are as follows: servo driver, WiFi access point, LiDAR distance sensor, infrared thermometer, and inertial measurement unit (IMU). Our software leverages standard I2C communication and high processing speed to read and update environmental variables. A modular organization includes several libraries dedicated to each peripheral for simplified execution in our main file where initialization, control, and scheduling take place.</p>
+
+    <p>The primary difficulty regarding software revolved around successfully implementing our WiFi access point. At first we had mistakenly implemented Bluetooth control, but quickly realized that this was beyond the usable scope of our wireless controller as we had envisioned (Bluetooth would be better suited for inter-Raspberry Pi communication). We followed Bruce Land's source code and were quickly able to get the example LED code running, but adding any new complexity to the page itself quickly crashed our interface, producing our error page repeatedly. With minimal debugging capability, this proved to be the greatest difficulty, though it was eventually achieved.</p>
+
+    <img src="images/wiring_diagram.png" alt="Complete System Wiring Diagram">
+    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Complete system wiring diagram showing all connections</em></p>
+
+    <h3>Servo Driver</h3>
+    <p>Our servo driver provides low-level servo control through hardcoded poses composed of individual servo assignments. The RP2040 communicates with a 16-channel PWM IC (PCA9685) over I2C to offload PWM generation to dedicated hardware, simplifying port management by freeing up PWM pins and simplifying timing constraints since the Raspberry Pi Pico is primarily occupied with WiFi updates, sensor reads, and program control.</p>
+
+    <p>On startup, the PCA9685 is initialized by storing both the I2C instance and its address before preparing each servo. The included library encapsulates this into a single <code>pca9685_init()</code> function which we use to start our program and thereafter set all 12 servos to a known initial pose: a combination of both "standing" and "X-position". Another library function called <code>pca9685_set_pwm_freq()</code> converts our desired PWM frequency (60 Hz) into a prescaled register value. This pairs with our primary function <code>pca9685_set_pwm()</code> to write 12-bit on and off pulses to each channel register in order to set channel pulse width and thus change each servo's position.</p>
+
+    <p>Positioned one logical level above this, our <code>movement_library.c</code> handles the translation of individual poses called in <code>main.c</code> to individual servo positions. Poses and actions such as <code>forward()</code>, <code>cw()</code>, <code>stand()</code>, and <code>right()</code> are all composed of hardcoded joint configurations. To eliminate some additional abstraction, servo channels are translated into named entities that each have their own PWM controller functions. Thus, <code>forward()</code> contains sequenced joint movements. Each of these functions undergoes an angle-to-PWM conversion <code>angles_to_pwm()</code> as previously described in the Background Math section.</p>
+
+    <pre>// Movement function example
+void forward(void) {
+    calf_4(45);
+    calf_1(45);
+    thigh_1(160);
+    thigh_3(160);
+    joint_1(100);
+    joint_3(90);
+    coop_sleep_ms(100);
+    joint_2(160);
+    joint_4(60);
+    coop_sleep_ms(200);
+    thigh_2(135);
+    thigh_4(135);
+    // ... continues
+}</pre>
+
+    <p>In order to maintain sensor communication during robot movement, a cooperative background function is utilized in replacement of <code>sleep_ms()</code>. Specifically, <code>coop_sleep_ms()</code> maintains timing control while preventing background starvation for all of the I2C sensors. As opposed to blocking execution for the full delay time, this function loops through a predefined <code>MOVEMENT_SLEEP_STEP_MS</code>, executing a background sensor read and refresh after each step until the full delay has been accounted for. This background routine called <code>robot_background_tick()</code> exists in our <code>main.c</code> file and updates sensor and control values for live continuous operation. This separation is critical for mapping data collection, accurate heading, and WiFi access page servicing. By using a predefined sleep step, we are able to accurately configure timing constraints across movement and real-time programs.</p>
+
+    <h3>WiFi Access Point</h3>
+    <p>Wireless communication is implemented using the Pico W and lwIP networking stack, following Bruce Land's WiFi access point (AP) example code. Our system produces a well-defined AP with live sensor data and several buttons to control both the robot's motions as well as its programmable scripts. The AP allows for direct local connectivity without additional infrastructure, supporting predictable latency characteristics.</p>
+
+    <p>The Pico W's initialization library starts up the on-chip CYW43 driver which configures the WiFi credentials and launches the networking stack including DHCP and DNS services. A TCP server handler manages incoming connections, prompting communication between the robot and the client controller. Sensor data such as heading, distance, and temperature are all transmitted to the controller at 10Hz. On the other side, over 15 buttons control robot movements and actions.</p>
+
+    <img src="images/wifi_interface.png" alt="WiFi Control Interface">
+    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: WiFi control interface showing sensor telemetry and control buttons</em></p>
+
+    <p>The webpage itself is implemented directly as an HTTP server using TCP callbacks, in which each GET request is parsed and organized to a given endpoint such as <code>/sensors</code>, <code>/cmd</code>, and <code>/map</code>. The sensor endpoint features validity flags for each printed value so that in the case of disconnected sensors the controller will read "--" for missing values. If the lwIP send-buffer is not available before sending large messages, the transmission will not be executed in order to prevent data loss or corruption.</p>
+
+    <p>A fun and very useful feature is our <code>test_server_content()</code> function which detects iOS connections through their "/hotspot-detect.html" request in order to automatically open the main controller page. Similar functions exist for both Android and Windows users though they were not utilized in our implementation.</p>
+
+    <p>Network servicing is also implemented cooperatively using a background refresh function in order to prevent processing backlog and delays. Both motion and action functions are executed outside the TCP receive handler. This means that button presses on the controller load commands on the Pico W into a fixed buffer which is dequeued and executed by <code>wifi_ap_background()</code>. This design prevents blocking functions from delaying the access point's responsiveness.</p>
+
+    <h3>LiDAR Distance Sensor</h3>
+    <p>Our LiDAR distance sensor is implemented using a TF-Luna sensor with I2C communication across three layers of abstraction: reading raw data, filtering measurements, and publishing to the global sensor structure.</p>
+
+    <p>In order to read raw sensor data, <code>tfluna_read_data()</code> executes I2C register reads and returns both distance and a matching validity field. We then filter these results using <code>read_lidar_filtered()</code> to conduct several measurements in a loop. These measurements are added to a buffer if their data is valid. This buffer's median is then read as the real distance value. The median was chosen to neglect interference from incorrect boundary readings (0 and values >>100 cm). If no data is valid, the function returns a failing value of 0. This filtered distance is then integrated into the whole system by the <code>update_sensor_data()</code> and <code>refresh_sensor_data()</code> functions. These update the global sensor data structure consisting of both measurement and validity flags. A global data structure was necessary to allow data to be both written in <code>main.c</code> and read in <code>wifi.c</code>. LiDAR refresh occurs at approximately 10 Hz to take full utilization of the I2C bandwidth and provide useful telemetry.</p>
+
+    <p>The LiDAR data itself is used primarily in the quadruped's mapping function, but is also printed to the WiFi controller interface. In <code>wifi.c</code>, the <code>/sensors</code> endpoint transmits this filtered data for display. For mapping, distance values are sampled at an even higher frequency during active sweeps (~100 Hz) to be stored alongside heading and temperature to create the environmental map.</p>
+
+    <h3>Infrared Temperature Sensor</h3>
+    <p>We interface with the MLX90614 non-contact infrared thermometer over I2C to read surrounding objects' temperatures at a distance. Similar to the LiDAR, several layers of abstraction exist to read register data, filter the measurements, and publish the data. An existing Arduino library for the MLX90614 was translated to C for our use case. The device can be found at its default address 0x5A.</p>
+
+    <p>Our <code>mlx90614.c</code> library reads temperature values by conducting two-byte reads from the sensor's registers. Each temperature register consists of 16 bits with 15 of those bits containing data. The two important registers we interface with are 0x07 (object temperature) and 0x06 (ambient temperature). A function <code>mlx90614_read_both_temps()</code> reads from both of these registers and creates 32-bit floating-point values using the following logic:</p>
+
+    <pre>Temp(K) = raw_value × 0.02
+Temp(°C) = Temp(K) − 273.15</pre>
+
+    <p>This data is then filtered using a <code>read_temp_filtered()</code> function which calls the read routine and sums all successful samples in the provided size parameter. Calculating the mean produces an appropriately filtered measurement given that temperature can only slowly vary.</p>
+
+    <p>As was the case before, filtered measurements are updated to the global sensor data structure for both WiFi and mapping purposes. In order to provide more meaningful data to those who use the imperial system, we also translate this data from Celsius to Fahrenheit before printing it to the user. A validity flag is also utilized to ensure that the data is only interpreted when it is accurate and updated.</p>
+
+    <h3>Inertial Measurement Unit (IMU)</h3>
+    <p>Communication with our inertial measurement unit (MPU6050) also occurs over I2C at the default address 0x68. Our code integrates this three-axis accelerometer and gyroscope to generate accurate heading data. Sensor data about the z-axis is used to determine the rotational velocity from which real-time quadruped heading is derived.</p>
+
+    <p>Raw IMU data is read in bursts from the ACCEL_XOUT_H (0x3B) register, where only the last two bytes are used in our case, corresponding to gyroscope readings in the z-direction. Each of these readings is a signed 16-bit integer which <code>mpu6050_read_raw()</code> turns into <code>int16_t</code> arrays. These measurements are then converted to floating point using fixed-point scaling before converting from angular rate to degrees per second.</p>
+
+    <p>During testing, we discovered that our gyroscope experienced constant drift. In order to fix this issue, we added bias calibration through <code>calibrate_gyro_bias()</code> which gets 200 measurements while the robot is stationary, converts each sample to floating point, computes the mean, and then stores this value as the global bias term. This was certainly a creative solution to a frustrating problem. However, this produced errors between different implementations of our code and was eventually scrapped for a default bias which is predefined in our codebase: <code>GYRO_Z_BIAS_DEFAULT</code>. The value we found sufficient was 2.5°/s.</p>
+
+    <p>In order to determine heading, we implemented <code>update_heading_from_gyro()</code>. This function first saves the current time in order to track the elapsed time, then integrates the gyro reading over the time interval. The heading variable is saved as a 32-bit float in degrees and kept within the 0-360° range.</p>
+
+    <p>The last data handling step is filtering, where we take this integrated heading and push it through a low-pass filter. This filter, implemented in our <code>smooth_heading()</code> function, finds the smallest angular difference between updates and applies exponential smoothing (α ≈ 0.15) for optimal filtering. The idea of exponential smoothing was actually an AI recommendation that proved useful. The filtered heading is then saved to the global sensor data structure for proper program handling.</p>
+
+    <h3>Main Control Program</h3>
+    <p>The primary level of our programming design exists in our <code>main.c</code> file where global state is managed through a cooperative loop that combines motion commands, sensor collection, WiFi servicing, and both mapping and scanning execution. The file consists of initialization and event loop, global state logic, sensor processing functions, and behavior routines.</p>
+
+    <p><code>Main.c</code> exists at the top level above all of its supporting libraries, which is why it includes a lengthy list of supplementary C files as previously described in this section (a .h file for each sensor and more). I2C is configured to 100kHz and SDA and SCL are declared on the RP2040's GPIO 2 and 3 and are pulled up to active high logic as necessary. At startup, <code>i2c_read_timeout_us()</code> is used to scan expected I2C addresses and alert whether an ACK has been received back from the address as opposed to a NACK or timeout. Flags for each sensor are then set high for active and remain low if detection fails (Flags: <code>g_found_lidar</code>, <code>g_found_imu</code>, <code>g_found_temp</code>, and PCA9685 driver). If flags are high for the given sensor/driver, the respective <code>init()</code> is called to start up the system. Given elaborate difficulties with getting our first temperature sensor to communicate over I2C, we implemented further logic to secure communication. If the initial detection fails, a dedicated routine will attempt to read and check the dedicated temperature register address. All sensor outputs from active sensors are published to the global structure so that local logic and the WiFi server can use real-time values.</p>
+
+    <p>Several helper functions exist to sample and filter the raw data from the sensors:</p>
+    <ul>
+        <li><code>median_u16()</code> takes the fixed buffer from the LiDAR and performs the median operator to filter distance measurements</li>
+        <li><code>read_lidar_filtered(int samples)</code> collects several successful measurements and returns the result using <code>median_u16()</code></li>
+        <li><code>read_temp_filtered(int samples)</code> takes several measurements and returns the average of successful samples</li>
+        <li><code>smooth_heading(float raw_deg)</code> applies exponential smoothing to reduce jitter at both boundaries (0° and 360°), finds the shortest angle delta within ±180°, updates filter state, and clips the result to [0,360]</li>
+    </ul>
+
+    <p>A neat feature of our main file is that you can directly control the quadruped over serial. Upon startup, our program prints the menu of controls which includes the complete list of movement and action capabilities. Entering the respective character into the serial terminal will trigger <code>getchar_timeout_us()</code> which prints back a fun response and then activates the expected result. For example, entering "P" or "p" into the serial terminal and pressing enter will print back "Ending Program\n", call <code>legs_up()</code> from the movement library (which looks like a dying spider), and then print "Please! I don't want to go\n" before ending the program.</p>
+
+    <p>An important attribute we wanted to add to our robot was an aspect of autonomy. Thus, we designed two scripts that could be run fully autonomously to produce meaningful results or interactions. The first is an environmental mapping script.</p>
+
+    <h3>Environmental Mapping Script</h3>
+    <p>The mapping script is implemented using a coordinated 360-degree sweep that samples heading, distance, and object temperature over time and stores the results in a fixed buffer for CSV export and offline visualization. A global data structure for mapping consists of arrays for <code>angles[]</code>, <code>distances[]</code>, and <code>temps[]</code>, in addition to a data count field and an active flag (<code>g_map</code>). This script only runs when either the WiFi controller selects the "360° Sweep" button or the mapping character is called in the serial terminal. At which point the <code>g_map</code> flag is set high and the function will be triggered in our main loop.</p>
+
+    <p>In <code>wifi.c</code>, the button request is parsed in <code>test_server_content()</code> and triggers <code>start_mapping_sweep()</code> to initialize the sweep data and enable sensor collection. Data sampling is performed by <code>sweep_collect_sample_if_due()</code> using the previously discussed cooperative background refresh. This function is specifically rate limited at 100Hz to provide enough data points for efficient and productive mapping results. When measuring heading, this function will use the global heading reading when it has a valid flag, but will otherwise rely on the unfiltered integrated heading to provide continuity in extreme environments. This heading is also passed through <code>smooth_heading()</code> to provide safe wraparound conditions and reduce noise/jitter. Distance is then obtained through <code>read_lidar_filtered(5)</code> and temperature through <code>read_temp_filtered(2)</code>. In order to exclude errors and noise, if any sensor returns -1 the data point is neglected. Similarly, if the distance is greater than 100 cm we choose to neglect the data (though this is configurable) so as to produce a more localized map even in a large room.</p>
+
+    <p>Successful samples are added to the map buffer with <code>map_add(&g_map, heading, dist, temp)</code>. This adds angular normalization to heading and adds a new entry or merges with an existing entry when the new heading is close to a previously stored heading within a set angular tolerance. Merging reduces redundancy which can occur during stale or slow movements. Live data points are printed to the serial terminal enabling real-time debugging and observation.</p>
+
+    <p>The sweep rotation is managed in the main loop as a simple iterable state machine which rotates using <code>cw()</code> or <code>ccw()</code> depending on the configuration. Sampling runs concurrently in the background during all movements, active and passive. Rotation ends when the accumulated heading has achieved at least 360 degrees. Once met, the <code>g_map</code> flag is set low and data is exported into CSV format using <code>dump_map_csv()</code>. Each point consists of [angle_deg, distance_cm, temp_c]. This function dumps all recorded data points (2000 maximum) into the serial terminal for quick copy and pasting.</p>
+
+    <p>An offline Python script can then be run on the produced CSV file to visualize the mapping results on your primary computer. Both a polar and Cartesian coordinate graph are generated with point color representing object temperature.</p>
+
+    <p>Our Python script, <code>plot_sweep_csv.py</code>, parses through each line of the provided CSV using Python's <code>csv.reader</code> to split rows by commas and then records angle, distance, and temperature into float lists after filtering out invalid or incomplete rows. In this manner, it rejects the header row (entry 0). Given that the robot remains at heading 0 for a long period of time during the start of our mapping script, these entries are neglected for easier visualization.</p>
+
+    <p>A helper function <code>plot_sweep(ang, dist, temp)</code> implements the remaining plotting logic. Temperature is converted from Celsius to Fahrenheit as previously described, and the color scale plot is normalized to the minimum and maximum of the dataset using <code>Normalize(vmin, vmax)</code>. Angles are converted to radians using <code>math.radians</code> since Matplotlib polar axes use radians not degrees. Then, Cartesian coordinates are generated using the standard polar-to-Cartesian transformations:</p>
+
+    <pre>x = r × cos(θ)
+y = r × sin(θ)</pre>
+
+    <p>The actual visualization uses Matplotlib to place three different figures: a polar scatter plot on the left, a Cartesian scatter plot on the right, and a vertical color scale in between. In the polar plot (<code>ax_polar</code>), the script calls <code>scatter(theta, distances, c=temps_f, cmap=cm.plasma, norm=norm, ...)</code> so that each sample is created as desired. Its axis is configured with <code>set_theta_zero_location("N")</code> so 0 degrees occurs at the very top of the plot, and <code>set_theta_direction(1)</code> so angles increase counterclockwise (consistent with our real sweep). In the Cartesian plot (<code>ax_cart</code>), the script scatters (x, y) with the same colormap and normalization so the two plots share the same temperature relationship. This draws axes lines at x=0 and y=0 to mark the robot's starting point, and measurements are in cm.</p>
+
+    <img src="images/mapping_result.png" alt="Environmental Mapping Result">
+    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Environmental mapping result showing polar and Cartesian views with thermal overlay. The quadruped was centered in a cardboard box enclosure with one end open to a human arm. The square shape of the box is clearly visible, and the higher temperature object (human) is easily recognizable.</em></p>
+
+    <p>On program completion, the Python script prints the total number of samples and launches the plots with <code>plt.show()</code>, which blocks until the user closes the resulting figure. A difficult step was trying to get our C program to automatically call this Python file and display the results on our WiFi AP, but we were restricted by the size of data that we could pass through our WiFi buffer. Implementing C-to-Python communication from the Raspberry Pi to the primary computer also proved significantly more daunting with difficult serial errors. This was eventually achieved but at very low data transmission rates. Live mapping was executed but was eventually scrapped given its complexity and slower data measurement rate.</p>
+
+    <h3>Thermal Scanning Script</h3>
+    <p>Our scanning program implements a scripted temperature scan of its forward-facing environment using controlled rotational motion to record the orientation with the highest detected object temperature before approaching this high-temperature object and waving hello. This program is triggered either from the serial command interface or via the WiFi AP with the "Scan/Approach" button.</p>
+
+    <p>At the start, the quadruped rotates counterclockwise 4 times, corresponding to roughly a 90-degree rotation depending on the surface friction. Then our robot takes a temperature reading before rotating clockwise for a total of 9 samples, corresponding to roughly a 180-degree sweep from the starting position. After each rotation, the program calls <code>refresh_sensor_data()</code> to update all telemetry data, guaranteeing that the robot's recorded temperature value matches the corresponding heading. Each temperature sample is stored in an array indexed by the current rotation number. The program tracks the largest value and checks whether each new measurement surpasses the previous value, replacing the maximum value if so. The program saves the largest temperature's index in order to recall what orientation the maximum occurred at, and more specifically how many turns it will take to return to this orientation. Upon scan completion, the routine finds the difference between the current number of rotations (8) and the index for the maximum temperature. A while loop depletes the rotations by going counterclockwise until the two are equal.</p>
+
+    <p>At this point, the robot begins moving <code>forward()</code>, approaching the hot object. Only once the object is detected using the LiDAR at less than 10 cm away, the robot will halt and say hello using the <code>hi()</code> function. Throughout the entire thermal sweep process, motion commands are blocking, but background servicing remains active through cooperative scheduling.</p>
+
+    <h3 id="hardware">Mechanical Design</h3>
+    <p>CAD design renders are available at: <a href="https://drive.google.com/file/d/1ueBsqph4X5NqCqQy36wpwHF9dA-HUB6E/view?usp=drive_link" target="_blank">Google Drive Link</a></p>
+
+    <h4>Custom Body Design</h4>
+    <p>The robot's body is a completely custom design created in CAD to address the specific requirements of our sensor suite and electronics layout. Unlike the legs, which were adapted from an existing open-source design, the body was designed from scratch to provide optimal mounting for the Raspberry Pi Pico W, sensor array, and power distribution system.</p>
+
+    <img src="images/cad_body_top.png" alt="Body CAD - Top View">
+    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Custom body design - top view</em></p>
+
+    <img src="images/cad_body_iso.png" alt="Body CAD - Isometric View">
+    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Custom body design - isometric view</em></p>
+
+    <img src="images/robot_body_assembled.jpg" alt="Assembled Robot Body">
+    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Assembled robot body showing component placement</em></p>
+
+    <p><strong>Key Design Features:</strong></p>
+    <p>The body implements a 2-layer mounting system that separates the servo driver and servo wiring (lower layer) from the microcontroller (upper layer) and sensors (front plate). This vertical stacking approach minimizes the robot's footprint while providing organized cable management. All servo cables route through internal channels and are enclosed within the body structure, preventing them from interfering with leg motion or snagging during operation.</p>
+
+    <p>Four corner mounting points attach the legs to the body using two M4 heat-set inserts and screws in each position. The body includes cutouts for cable routing for the fore-mounting sensors: LiDAR sensor (forward-facing), IR temperature sensor (forward-facing below the LiDAR), and IMU (centered for accurate heading measurement on the top of the body).</p>
+
+    <p>Additional mounting provisions use M2.5 heat-set inserts (14 total) to secure the Raspberry Pi Pico W, PCA9685 servo driver board, and the sensors on the fore plate. The design accommodates all cable routing and bend radii. While the original design intended for a soldered breadboard to be secured with M2.5 screws, we ended up using the sticky backing on the breadboard to secure it to the top of the body, which proved adequate for our needs.</p>
+
+    <h4>Leg Design and Assembly</h4>
+    <p>The leg design was adapted from an <a href="https://www.instructables.com/3D-Printed-Raspberry-Pi-Spider-Robot-Platform/" target="_blank">open-source 3D-printed quadruped available on Instructables</a>. Each leg consists of three segments (joint, thigh, calf) providing three degrees of freedom per leg, for a total of 12 DOF across the robot.</p>
+
+    <img src="images/cad_assembly_top.png" alt="Full Assembly - Top View">
+    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Complete robot assembly - top view</em></p>
+
+    <img src="images/cad_assembly_iso.png" alt="Full Assembly - Isometric View">
+    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Complete robot assembly - isometric view</em></p>
+
+    <p><strong>Leg Kinematics:</strong></p>
+    <p>Each leg features:</p>
+    <ul>
+        <li><strong>Joint servo/hips (rotation):</strong> Enables leg rotation around the vertical axis for steering and strafing motions</li>
+        <li><strong>Thigh servo (elevation):</strong> Controls leg lift height for swing phase during walking</li>
+        <li><strong>Calf servo (extension):</strong> Adjusts leg reach and ground contact angle</li>
+    </ul>
+    <p>The three-segment design allows for a wide range of motion and enables both simple gaits (alternating diagonal pairs for trot gait) and complex maneuvers (individual leg control for turning in place).</p>
+
+    <p><strong>Assembly Method:</strong></p>
+    <p>Leg segments connect to each other through the servo horns and a snap-in bump. The joints/hips connect to the body via M4 heat-set inserts and screws. The joint-to-thigh connection proved looser than desired after 3D printing due to its length. Rubber bands were added as reinforcement to eliminate play in this critical joint, significantly improving motion quality and preventing position drift.</p>
+
+    <p><strong>Foot Design:</strong></p>
+    <p>The original design specified TPU (thermoplastic polyurethane) feet for their flexibility and grip properties. While TPU provided some cushioning, it proved less grippy than expected on smooth surfaces. Gorilla tape was applied to the bottom of each foot to enhance traction, which dramatically improved walking stability and prevented slipping during turns.</p>
+
+    <img src="images/robot_feet.jpg" alt="TPU Feet with Gorilla Tape">
+    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: TPU feet with Gorilla tape applied for improved traction</em></p>
+
+    <p><strong>Design Iterations:</strong></p>
+    <p>The initial body print exhibited excessive flexibility due to insufficient infill percentage, causing motion quality issues as the frame flexed under servo loads. The design was revised with increased wall thickness and infill along with thicker dimensions (the base plate is now 3mm), providing the necessary rigidity. The leg attachment points were also reinforced with thicker printing settings. Print settings were optimized for a Bambu X1C printer.</p>
+
+    <p>The modular design allows for easy maintenance and component replacement. Cable routing was carefully planned to prevent interference with moving parts, with all servo cables running through designated channels in the body and secured with zip ties at strategic points. Power wires are kept separate from signal wires to minimize electrical noise, and all exposed power connections are insulated with electrical tape for safety.</p>
+
+    <p><strong>Assembly Considerations:</strong></p>
+    <p>The modular design allows for easy maintenance and component replacement. Servos can be removed individually by extracting the M4 screws, and electronics are accessible by removing the upper body layer. Heat-set inserts provide reusable threaded connections that don't degrade with repeated assembly/disassembly cycles, unlike direct threading into plastic.</p>
+
+    <p>The final assembled robot measures approximately 30cm × 30cm × 5cm (L × W × H) when splayed into the neutral X-position.</p>
+
+    <p><strong>Assembly Notes:</strong> The servos are positional. When first setting up the legs, you must not attach the servo horns. The <code>setup_servos()</code> command must be uncommented in main and then the servos should be attached to each joint once that program is running. This ensures that each joint is in the position it thinks it is in.</p>
+
+    <h3>Things That Didn't Work</h3>
+    <ul>
+        <li><strong>Live mapping visualization on Pico:</strong> We tried creating the mapping visualization plot on the Pico and streaming it to the WiFi interface, but it repeatedly crashed the website due to memory constraints and data buffer limitations.</li>
+        <li><strong>Temperature sensor integration:</strong> The MLX90614 temperature sensor took considerable time to integrate properly. We debugged it by first getting it running in C++ via Arduino since there's an Arduino library for it with plenty of example code online. We used that to ensure the sensor worked, then translated everything to work with the Pico.</li>
+        <li><strong>Blown servo driver boards:</strong> We (Sarah Grace, oops) blew multiple PCA9685 servo boards by connecting V+ and VCC flipped. This was a costly learning experience about double-checking power connections!</li>
+    </ul>
+
+    <h3>AI Usage</h3>
+    <p>We used AI tools extensively throughout the project for debugging and code translation:</p>
+    <ul>
+        <li>Debugging C code when encountering I2C communication errors and timing issues</li>
+        <li>Helping transcribe the original Python movement library to C code, adapting the structure for our servo channel mapping</li>
+        <li>Assisting with sensor .c and .h file creation and cross-checking against datasheets to ensure correct register addresses and I2C protocols</li>
+        <li>Suggesting the exponential smoothing filter approach for IMU heading, which proved very effective</li>
+        <li>Helping troubleshoot WiFi connectivity issues and TCP buffer management</li>
+    </ul>
+
+    <h3>Code and Design References</h3>
+    <table>
+        <tr>
+            <th>Component</th>
+            <th>Source</th>
+            <th>Usage</th>
+        </tr>
+        <tr>
+            <td>Leg Geometry</td>
+            <td><a href="https://www.instructables.com/3D-Printed-Raspberry-Pi-Spider-Robot-Platform/" target="_blank">Instructables Quadruped</a></td>
+            <td>Adapted 3D-printed leg design with three-segment kinematics</td>
+        </tr>
+        <tr>
+            <td>Movement Library</td>
+            <td><a href="https://github.com/ConnorLynaugh/Digital-Design-with-Micro-Controllers" target="_blank">Python Quadruped Library</a></td>
+            <td>Reference for gait patterns and servo sequences, translated to C</td>
+        </tr>
+        <tr>
+            <td>MLX90614 Driver</td>
+            <td>Arduino MLX90614 Library</td>
+            <td>Translated from Arduino C++ to C for Pico SDK</td>
+        </tr>
+        <tr>
+            <td>WiFi AP Example</td>
+            <td>Bruce Land's Pico Examples</td>
+            <td>Base code for WiFi access point and TCP server implementation</td>
+        </tr>
+        <tr>
+            <td>PCA9685 Datasheet</td>
+            <td><a href="https://www.adafruit.com/product/815" target="_blank">Adafruit</a></td>
+            <td>I2C register addresses and PWM configuration</td>
+        </tr>
+        <tr>
+            <td>MPU6050 Datasheet</td>
+            <td>InvenSense</td>
+            <td>Gyro/accelerometer register map and scaling factors</td>
+        </tr>
+        <tr>
+            <td>TF-Luna Datasheet</td>
+            <td>Benewake</td>
+            <td>I2C protocol and distance register addresses</td>
+        </tr>
+        <tr>
+            <td>MLX90614 Datasheet</td>
+            <td>Melexis</td>
+            <td>IR temperature sensor I2C protocol and register map</td>
+        </tr>
+    </table>
+
+    <h3>Bill of Materials</h3>
+    <table>
+        <tr>
+            <th>Component</th>
+            <th>Description</th>
+            <th>Quantity</th>
+            <th>Cost (USD)</th>
+            <th>Source</th>
+        </tr>
+        <tr>
+            <td colspan="5" style="background-color: #e8e8e8; font-weight: bold;">Electronics</td>
+        </tr>
+        <tr>
+            <td>Raspberry Pi Pico W</td>
+            <td>Main microcontroller</td>
+            <td>1</td>
+            <td>$7.00</td>
+            <td><a href="https://www.raspberrypi.com/products/raspberry-pi-pico/" target="_blank">Raspberry Pi</a></td>
+        </tr>
+        <tr>
+            <td>MG90S Servos</td>
+            <td>Leg actuation servos</td>
+            <td>12 (16-pack)</td>
+            <td>$28.99</td>
+            <td><a href="https://www.amazon.com" target="_blank">Amazon</a></td>
+        </tr>
+        <tr>
+            <td>Adafruit PCA9685</td>
+            <td>16-Channel 12-bit PWM/Servo Driver</td>
+            <td>1</td>
+            <td>$14.95</td>
+            <td><a href="https://www.adafruit.com/product/815" target="_blank">Adafruit</a></td>
+        </tr>
+        <tr>
+            <td>MPU6050 IMU</td>
+            <td>6-axis gyroscope + accelerometer</td>
+            <td>1 (3-pack)</td>
+            <td>$9.59</td>
+            <td><a href="https://www.amazon.com" target="_blank">Amazon</a></td>
+        </tr>
+        <tr>
+            <td>MLX90614</td>
+            <td>Non-contact IR temperature sensor</td>
+            <td>1</td>
+            <td>$11.99</td>
+            <td><a href="https://www.amazon.com" target="_blank">Amazon</a></td>
+        </tr>
+        <tr>
+            <td>TF-Luna LiDAR</td>
+            <td>ToF distance sensor 0.2-8m range</td>
+            <td>1</td>
+            <td>$23.37</td>
+            <td><a href="https://www.amazon.com" target="_blank">Amazon</a></td>
+        </tr>
+        <tr>
+            <td>5V Power Supply</td>
+            <td>Bench power supply (2.5A)</td>
+            <td>1</td>
+            <td>N/A</td>
+            <td>Lab equipment</td>
+        </tr>
+        <tr>
+            <td>Jumper Wires</td>
+            <td>Breadboard connections</td>
+            <td>Assorted</td>
+            <td>N/A</td>
+            <td>Lab</td>
+        </tr>
+        <tr>
+            <td colspan="5" style="background-color: #e8e8e8; font-weight: bold;">Mechanical Components</td>
+        </tr>
+        <tr>
+            <td>PLA Filament</td>
+            <td>3D printed frame and legs</td>
+            <td>~200g</td>
+            <td>~$1.00</td>
+            <td>Engineering</td>
+        </tr>
+        <tr>
+            <td>TPU Filament</td>
+            <td>Flexible feet material</td>
+            <td>~50g</td>
+            <td>~$1.00</td>
+            <td>Engineering</td>
+        </tr>
+        <tr>
+            <td>M4 Heat Set Inserts</td>
+            <td>Leg joint fasteners</td>
+            <td>24</td>
+            <td>~$2.00</td>
+            <td>Engineering</td>
+        </tr>
+        <tr>
+            <td>M4 Screws</td>
+            <td>Leg joint assembly</td>
+            <td>24</td>
+            <td>~$3.00</td>
+            <td>Engineering</td>
+        </tr>
+        <tr>
+            <td>M2.5 Heat Set Inserts</td>
+            <td>Body/electronics mounting</td>
+            <td>14</td>
+            <td>~$2.00</td>
+            <td>Engineering</td>
+        </tr>
+        <tr>
+            <td>M2.5 Screws</td>
+            <td>Body/electronics mounting</td>
+            <td>14</td>
+            <td>~$2.00</td>
+            <td>Engineering</td>
+        </tr>
+        <tr>
+            <td>Zip Ties</td>
+            <td>Cable management</td>
+            <td>Assorted</td>
+            <td>~$1.00</td>
+            <td>Lab</td>
+        </tr>
+        <tr>
+            <td>Rubber Bands</td>
+            <td>Joint reinforcement</td>
+            <td>~10</td>
+            <td>~$1.00</td>
+            <td>Lab</td>
+        </tr>
+        <tr>
+            <td>Gorilla Tape</td>
+            <td>Foot grip enhancement</td>
+            <td>1 roll</td>
+            <td>~$2.00</td>
+            <td>Engineering</td>
+        </tr>
+        <tr style="font-weight: bold;">
+            <td colspan="3">Total Estimated Cost</td>
+            <td>~$111</td>
+            <td></td>
+        </tr>
+    </table>
+</section>
 
             <section id="results">
                 <h2>Results</h2>
