@@ -289,11 +289,17 @@
                     <strong>Project Overview:</strong> A 12-DOF quadruped robot with 3 servos per leg and WiFi control that uses environmental feedback from an IMU, LiDAR, and infrared temp sensor to navigate, identify targets, and map its environment autonomously using distance and temperature data.
                 </div>
 
-                <img src="images/mainphoto.png" alt="Assembled Quadruped Robot - Main View">
-<p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 1: Fully assembled quadruped robot</em></p>
+       <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+  <div style="text-align: center;">
+    <img src="images/mainphoto.png" alt="Assembled Quadruped Robot - Main View" style="max-width: 100%; height: auto;">
+    <p style="color: #7f8c8d; font-size: 11px;"><em>Figure 1: Fully assembled quadruped robot</em></p>
+  </div>
 
-<img src="images/main2.png" alt="Assembled Quadruped Robot - Alternative View">
-<p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 2: Quadruped robot showing sensor array and mechanical structure</em></p>
+  <div style="text-align: center;">
+    <img src="images/main2.png" alt="Assembled Quadruped Robot - Alternative View" style="max-width: 100%; height: auto;">
+    <p style="color: #7f8c8d; font-size: 11px;"><em>Figure 2: Quadruped robot showing sensor array and mechanical structure</em></p>
+  </div>
+</div>
 
                 <h2 id="summary">Summary</h2>
                 <p>We designed and built a 12 degree-of-freedom (3 servos per leg × 4 legs) quadruped robot controlled by a Raspberry Pi Pico W, featuring integrated environmental sensing and a wireless WiFi controller. Starting from a custom CAD body and 3D-printed frame, the robot combines mechanical engineering and embedded electrical engineering to create a platform capable of coordinated four-legged locomotion, heading determination, environmental mapping, and target detection. In order to do so, our system leverages several sensors including an IMU, a solid state LiDAR sensor, and a contact-less infrared sensor.</p>
@@ -307,17 +313,13 @@
                 <h3>Mechanical Design</h3>
                 <p>We created a custom 3D-printed body and leg assemblies optimized for our specific servo operation requirements and sensor placement. After encountering flexibility issues with initial prints due to insufficient infill, we redesigned the frame to provide rigid mounting points for all four legs and the twelve MG90S servos while accommodating the electronics and wiring on the body through implementing a 2-layer mounting system, enclosing all of the servo cables. The design includes TPU grippy feet for improved traction and stability. The leg files are based off an <a href="https://www.instructables.com/3D-Printed-Raspberry-Pi-Spider-Robot-Platform/" target="_blank">existing online design</a>, but the attachment to the body and the body itself is all custom to allow for mounting of the Raspberry Pi and sensors.</p>
 
-                <img src="images/cad_body_top.png" alt="CAD Body Design - Top View">
-                <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 2: Custom body CAD design - top view</em></p>
+                <img src="images/full_cad.png" alt="CAD Body Design">
+                <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 2: Custom body CAD design </em></p>
 
-                <img src="images/cad_body_iso.png" alt="CAD Body Design - Isometric View">
-                <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 3: Custom body CAD design - isometric view showing 2-layer structure</em></p>
 
-                <img src="images/cad_assembly_top.png" alt="Full Assembly - Top View">
-                <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 4: Complete robot assembly - top view</em></p>
 
-                <img src="images/cad_assembly_iso.png" alt="Full Assembly - Isometric View">
-                <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 5: Complete robot assembly - isometric view</em></p>
+                <img src="images/assem.png" alt="Full Assembly">
+                <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 5: Complete Robot Assembly</em></p>
 
                 <h3>Locomotion System</h3>
                 <p>Twelve servos provide three degrees of freedom per leg (joint rotation, thigh angle, and calf angle), controlled via an Adafruit PCA9685 16-channel PWM driver over I2C. We implemented coordinated gait patterns that enable the robot to walk forward, backward, turn in place, and complete fun gestures such as waving, squatting, and shuffling. We took initial servo positions and control sequences for these movements from a <a href="https://github.com/ConnorLynaugh/Digital-Design-with-Micro-Controllers" target="_blank">Python library</a> and adapted them for C.</p>
@@ -327,15 +329,18 @@
                 <ul>
                     <li><strong>MPU6050 IMU</strong> for heading determination and orientation tracking to map the environment</li>
                     <li><strong>TF-Luna LiDAR</strong> for distance ranging (0.2-8m) to detect obstacles and map surroundings</li>
-                    <li><strong>MLX90614 infrared temperature sensor</strong> for heat signature detection and thermal mapping (effective range ~30cm for human-sized targets)</li>
+                    <li><strong>MLX90614 infrared temperature sensor</strong> for heat signature detection and thermal mapping (effective range ~1m for human-sized targets)</li>
                 </ul>
 
-                <img src="images/wiring_diagram.png" alt="System Wiring Diagram">
+                <img src="images/circuit2.png" alt="System Wiring Diagram">
                 <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 6: Complete system wiring diagram</em></p>
 
                 <h3>Wireless Control</h3>
                 <p>A WiFi-based control interface allows real-time command and control from a computer or mobile device on the local network (we used an iPad), enabling remote operation and monitoring of the robot's sensor data.</p>
 
+                 <img src="images/control.png" alt="Wifi Controller Interface">
+                <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 7: Wifi Controller Interface</em></p>
+                
                 <h2 id="why">Why We Built This</h2>
                 <p>We wanted to create a robot that truly interacts with the world around it. Rather than building a machine that simply responds to pre-programmed commands, we set out to design a sensing platform that could perceive, understand, and navigate complex environments autonomously while moving in a unique and challenging way. The platform we built has the potential to execute various autonomous missions with different sensor-driven objectives.</p>
 
@@ -467,51 +472,48 @@ void set_servo_angle(uint8_t channel, float angle) {
 
                 <p>During a 360-degree sweep, samples are collected at approximately 100 Hz. As the robot rotates, each sample is stored with its current heading from the gyro integration, the distance reading from the LiDAR, and the temperature from the IR sensor. The data remains in polar form and is exported to CSV for visualization.</p>
 
-                <h4>Polar Visualization</h4>
-                <p>Our Python visualization script plots the data directly in polar coordinates using matplotlib's polar projection. The angles are converted from degrees to radians for matplotlib compatibility:</p>
-                <pre># Convert angles to radians for matplotlib polar plot
+             <h4>Polar Visualization</h4>
+
+<p>
+Our Python visualization plots the 360° sweep directly in polar coordinates using
+matplotlib’s polar projection. Angle measurements received from the robot (in degrees)
+are converted to radians for compatibility with matplotlib:
+</p>
+
+<pre># Convert angles to radians for matplotlib polar plot
 theta_rad = [math.radians(a) for a in angles]
 
 # Create polar scatter plot
-ax.scatter(theta_rad, distances, c=temps_f, cmap='plasma')</pre>
+ax.scatter(theta_rad, distances, c=temps, cmap="plasma")</pre>
 
-                <p>We also create a top-down Cartesian view by converting polar to Cartesian coordinates:</p>
-                <p style="text-align: center; font-style: italic;">x = r × cos(θ)</p>
-                <p style="text-align: center; font-style: italic;">y = r × sin(θ)</p>
+<p>
+Point color represents measured temperature, allowing spatial temperature variation
+to be visualized alongside distance data.
+</p>
 
-                <pre># Convert polar to Cartesian for top-down view
-x_coords = [r * math.cos(t) for r, t in zip(distances, theta_rad)]
-y_coords = [r * math.sin(t) for r, t in zip(distances, theta_rad)]</pre>
+<p>
+We also generate a top-down Cartesian map by converting polar coordinates into a
+robot-centered reference frame:
+</p>
 
-                <h4>Gait Kinematics</h4>
-                <p>For a trot gait where diagonal leg pairs move together, phase relationships are:</p>
-                <ul>
-                    <li>Front Right + Back Left: 0° phase</li>
-                    <li>Front Left + Back Right: 180° phase</li>
-                </ul>
+<p style="text-align: center; font-style: italic;">
+x = r × sin(θ) &nbsp;&nbsp;&nbsp; y = −r × cos(θ)
+</p>
 
-                <p>For precise control during creep gaits, we implemented inverse kinematics using the law of cosines:</p>
-                <pre>void leg_position_fb(float y, int l, int s) {
-    float c = 93.0f;  // Calf length (mm)
-    float t = 75.0f;  // Thigh length (mm)
-    float h = 40.0f;  // Height offset
-    float xs = 31.8f; // Default x position
-    
-    float z = sqrtf(y * y + xs * xs);
-    float w = sqrtf(h * h + z * z);
-    float theta_h = atan2f(z, h) * 180.0f / M_PI;
+<pre># Convert polar to Cartesian for top-down view
+x_coords = [r * math.sin(t) for r, t in zip(distances, theta_rad)]
+y_coords = [-r * math.cos(t) for r, t in zip(distances, theta_rad)]</pre>
 
-    // Joint angle
-    float theta_j = 135.0f - atan2f(y, xs) * 180.0f / M_PI;
+<p>
+This coordinate convention places 0° directly in front of the robot and produces an
+intuitive top-down environmental map.
+</p>
 
-    // Thigh angle using law of cosines
-    float theta_t = acosf((t*t + w*w - c*c) / (2.0f*t*w)) * 180.0f/M_PI + theta_h;
+          <img src="images/polarmap.png" alt="Envirionmental Map">
+                <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure 8: Environmetal Map from Robot Sensor Data</em></p>
+                
 
-    // Calf angle using law of cosines
-    float theta_c = acosf((t*t + c*c - w*w) / (2.0f*t*c)) * 180.0f / M_PI;
-
-    // Apply to specified leg...
-}</pre>
+              
 
               <h4>Power Calculations</h4>
 <p>Peak current draw calculation:</p>
@@ -614,25 +616,17 @@ plot_sweep_csv.py        - CSV plotting utility</pre>
                 <p><strong>Disadvantages:</strong> Cable restricts range to ~2-3 meters and can interfere with motion during turns, power supply current limit (2.5A) below theoretical peak draw (3.36A) means risk of brownouts during simultaneous servo movements, tether creates dependency on nearby wall outlet limiting deployment scenarios.</p>
                 <p><strong>Mitigation and Reality:</strong> Gait patterns naturally stagger servo movements - during a trot gait, only 6 servos (diagonal pair) move simultaneously under heavy load, keeping typical current around 2A average. Simple movements like forward, backward, and gentle turns stay well within the 2.5A limit. However, complex movements like "shuffle" that activate many servos simultaneously did occasionally trigger the overload indicator on our bench supply, causing brief voltage dips. For this educational project, tethered operation was acceptable as our test area was controlled and we prioritized unlimited runtime for iterative testing over mobility. A production version would require a 3S LiPo battery (11.1V, 2200mAh minimum) with a 5V buck converter rated for 4A continuous.</p>
 
-                <h4>Custom vs. Commercial Frame</h4>
-                <p><strong>Decision:</strong> Hybrid approach - adapted open-source leg design, fully custom body.</p>
-                <p><strong>Rationale:</strong> Saved approximately 40 hours of CAD work on leg geometry while maintaining full control over sensor mounting, electronics layout, and cable management through the custom 2-layer body design. The leg kinematics were proven and well-documented, eliminating risk of mechanical design errors. Our custom body allowed precise positioning of the LiDAR (forward-facing), IR sensor (forward at specific height), and IMU (centered for accurate heading), which would be impossible to retrofit onto an existing commercial quadruped frame.</p>
-
+        
                 <h4>WiFi vs. Bluetooth</h4>
                 <p><strong>Decision:</strong> WiFi access point mode.</p>
                 <p><strong>Rationale:</strong> Higher bandwidth supports streaming all sensor data simultaneously (heading, distance, temperature at 10 Hz). Serves full web interface accessible from any browser without custom app development or installation. WiFi power consumption (~50-70mA extra) is negligible compared to servo draw (2000mA average). Longer range (~30m vs. ~10m for BLE) better for outdoor testing. AP mode creates captive portal effect - when iOS/Android devices connect, they automatically open the control page without requiring manual URL entry.</p>
 
-                <h4>Memory Management</h4>
-                <p><strong>Decision:</strong> Fixed arrays, no dynamic allocation, CSV export clears map buffer for reuse.</p>
-                <p><strong>Rationale:</strong> Memory budget breakdown: ~100KB code/stack, ~40KB WiFi/lwIP, ~30KB mapping arrays (1000 samples × 10 bytes), ~5KB sensor buffers, ~89KB margin. Fixed allocation at compile time prevents heap fragmentation issues on resource-constrained system. Maximum map size of 1000 samples provides sufficient resolution for room-scale mapping (~10 samples per degree during 360° sweep). After CSV export, the map buffer is reset for the next sweep without memory leaks.</p>
-
+                
                 <h4>Sensor Fusion Approach</h4>
                 <p><strong>Decision:</strong> Simple gyro integration with automatic bias calibration and 0.2°/s deadband filtering.</p>
                 <p><strong>Rationale:</strong> For slow rotation during mapping sweeps (180°/min, 3°/s angular velocity), simple integration with drift mitigation is sufficient. Our testing showed accumulated drift of only 5-10° over full 360° sweep (~2 minutes). Kalman filtering would require accelerometer fusion, add ~2KB code, consume 5-10% CPU, and provide minimal accuracy improvement for this use case. The bias calibration (200 samples at startup) and deadband (0.2°/s threshold) effectively eliminate drift over mapping timescales. For applications requiring absolute heading over hours, a magnetometer would be necessary, but for our 2-4 minute mapping sweeps, gyro-only tracking proved adequate.</p>
 
-                <h4>Cooperative Multitasking vs. RTOS</h4>
-                <p><strong>Decision:</strong> Custom cooperative sleep mechanism breaking delays into 10ms chunks.</p>
-                <p><strong>Rationale:</strong> No hard real-time requirements exist in our system. Movement sequences can tolerate ~10ms jitter without visible impact on gait quality. WiFi servicing occurs during these 10ms windows, preventing connection timeouts. Sensor polling (100ms period) and heading integration (2ms period) fit comfortably within cooperative scheduling. RTOS (FreeRTOS) would add 10-20KB code overhead, 2-4KB RAM for task stacks, steeper learning curve, and debugging complexity. Our cooperative approach uses <1KB additional code and is trivial to debug with printf statements. For future work requiring multiple simultaneous autonomous behaviors, RTOS might become beneficial, but for current functionality, cooperative multitasking proved simpler and sufficient.</p>
+               
 
                 <h3 id="ip">Patents, Copyrights, and Trademarks</h3>
                 <p>This project uses open-source components with proper attribution: quadruped leg geometry from <a href="https://www.instructables.com/3D-Printed-Raspberry-Pi-Spider-Robot-Platform/" target="_blank">Instructables</a> (Creative Commons license), Python movement library reference (MIT License), and Raspberry Pi Pico SDK (BSD-3-Clause). Sensor drivers were developed using manufacturer datasheets and public I2C specifications.</p>
