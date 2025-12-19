@@ -1095,16 +1095,91 @@ y = r × sin(θ)</pre>
 </ul>
 </section>
 
-<!-- Results section from previous response -->
 <section id="results">
     <h2>Results</h2>
-    <!-- [Content as provided in previous response] -->
+
+    <h3 id="test-data">Test Data and Demonstrations</h3>
+    
+    <h4>Environmental Mapping</h4>
+    <p>The mapping system successfully captured detailed environmental profiles combining distance and temperature data. The polar coordinate plots clearly show obstacles detected by the LiDAR and thermal signatures identified by the IR sensor. The square shape of the cardboard barrier enclosure is clearly visible in the resulting map data, demonstrating accurate spatial reconstruction from our sensor fusion approach. We placed hot and cold beverages in each corner of the mapped area to clearly demonstrate the system's thermal detection capabilities and spatial accuracy.</p>
+
+    <img src="images/mapping_polar_cartesian.png" alt="Environmental Scan Results">
+    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Environmental mapping results showing polar (left) and Cartesian (right) views with thermal overlay. Hot and cold beverages placed in corners are clearly distinguishable by temperature.</em></p>
+
+    <img src="images/physical_setup.jpg" alt="Physical Environment">
+    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Physical test environment showing cardboard barrier setup and beverage placement</em></p>
+
+    <img src="images/comparison_physical_map.jpg" alt="Physical vs Map Comparison">
+    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: Side-by-side comparison of physical environment layout and corresponding map visualization, confirming spatial accuracy</em></p>
+
+    <p><em>Video demonstrations:</em></p>
+    <ul>
+        <li>Autonomous 360° scanning sweep with live data collection</li>
+        <li>Thermal target identification and autonomous approach behavior</li>
+        <li>WiFi control interface demonstration with real-time telemetry</li>
+    </ul>
+
+    <h3 id="speed">Speed of Execution and Responsiveness</h3>
+    <p>The robot demonstrated minimal hesitation during operation and worked as expected. Movement commands from the WiFi controller were executed immediately with no perceptible lag. The cooperative multitasking implementation successfully maintained sensor updates during movement sequences without causing motion stuttering or interruption. The 360-degree mapping sweep collected samples at approximately 100 Hz while simultaneously rotating and updating heading calculations, demonstrating effective concurrency on the single-core Pico W. Serial command processing responded instantly to user input. The web interface updated sensor telemetry smoothly without affecting movement control performance.</p>
+
+    <h3 id="accuracy">Accuracy</h3>
+    <p>The gyro integration with bias calibration and deadband filtering demonstrated minimal drift, returning to the starting orientation within 5-10 degrees after a full 360-degree rotation over approximately 2 minutes. The TF-Luna LiDAR achieved repeatability within ±2 cm as specified in the datasheet, with median filtering successfully rejecting noise. The MLX90614 IR thermometer accurately identified warm targets (such as a person's hand) against cooler backgrounds. The sensor's 90° field of view means the effective range depends on target size; for larger objects like human body parts, detection worked reliably at approximately 30cm (1 foot), while smaller objects required closer proximity. All sensor data was easily copied from the serial monitor to CSV format without corruption, and the resulting environmental map clearly shows the square geometry of the cardboard enclosure and placed objects, confirming spatial accuracy.</p>
+
+    <h3 id="safety">Safety Design</h3>
+    <p>Safety was enforced through multiple design considerations. All power supply connections were covered in electrical tape to prevent shorting and protect users from exposed conductors. The system operates at 5V, well below electrical shock hazard threshold, with common ground connections preventing voltage differences. The robot has minimal force capability due to small servo size and lightweight construction, making it incapable of causing injury. The TF-Luna uses an eye-safe Class 1 laser, the MLX90614 IR sensor is completely passive, and the MPU6050 is self-contained with no external emissions. The WiFi control interface allows safe-distance operation, and emergency stop is available by unplugging power or pressing 'P' on the serial terminal.</p>
+
+    <h3 id="usability">Usability</h3>
+    <p>The robot proved highly usable for both our team and outside users. The WiFi control interface provides intuitive operation as users simply connect to the "quadruped_ap" WiFi network (password: "password") and navigate to the robot's IP address in any web browser. No software installation or configuration is required. The interface presents clearly labeled buttons for all movement commands with real-time sensor readings displayed. We successfully demonstrated the robot to classmates who controlled it immediately without instruction. The serial terminal interface provides advanced functionality for users comfortable with command-line interaction. Setup time is minimal - plug in power, wait for WiFi to initialize (~10 seconds), and connect. The robot's portable form factor and robust construction allowed easy transport between testing locations and graceful recovery from tip-overs during testing.</p>
+
+    <img src="images/wifi_interface.png" alt="WiFi Control Interface">
+    <p style="text-align: center; color: #7f8c8d; font-size: 11px;"><em>Figure: WiFi control interface showing intuitive button layout and real-time sensor telemetry</em></p>
 </section>
 
-<!-- Conclusions section from previous response -->
 <section id="conclusions">
     <h2>Conclusions</h2>
-    <!-- [Content as provided in previous response] -->
+
+    <h3>Design Analysis and Results</h3>
+    <p>Our quadruped robot met and exceeded our initial expectations. The robot successfully demonstrated coordinated four-legged locomotion with all movement patterns (walking, turning, waving, etc.) working reliably. All three sensors (MPU6050 IMU, TF-Luna LiDAR, MLX90614 IR temperature) functioned properly and were successfully fused to work together for environmental awareness. The robot demonstrated autonomous decision-making capabilities, using sensor data to identify thermal targets and navigate toward them during the programmed scan/approach mode. The 360-degree mapping sweep successfully collected environmental data combining heading, distance, and temperature measurements, which could then be visualized as a map of the environment. The WiFi control interface worked well, providing responsive remote operation and a real-time display of sensor values on any connected device.</p>
+
+    <h3>What We Would Do Differently</h3>
+    <p>Given the opportunity to redesign, we would make several improvements:</p>
+    <ul>
+        <li><strong>Custom PCB:</strong> Design a custom PCB to replace the breadboard connections, reducing wiring complexity and improving reliability. This would also reduce the overall footprint and weight of the electronics package.</li>
+        <li><strong>Mechanical Joint Improvement:</strong> Replace the rubber bands currently holding the middle joint (thigh to hip connection) in place with a more integrated mechanical connection such as a snap-fit or bolt assembly. This joint proved to be loose after 3D printing, leading to some quality of motion loss prior to the addition of rubber bands.</li>
+        <li><strong>Battery Power:</strong> Transition to battery power rather than tethered supply to enable true untethered autonomous operation without range limitations. A 3S LiPo battery (11.1V, 2200mAh minimum) with a 5V buck converter rated for 4A continuous would provide adequate runtime and power.</li>
+        <li><strong>Improved Foot Design:</strong> Redesign the feet with a more grippy material than TPU, as we ended up placing Gorilla tape on the feet when the TPU proved less grippy than expected. A proper rubber compound or textured material would eliminate the need for tape modifications.</li>
+        <li><strong>Enhanced Calibration:</strong> Implement automatic gyro bias calibration on each power-up rather than using a fixed default value, improving heading accuracy across different environments and temperatures.</li>
+    </ul>
+
+    <h3>Standards Conformance</h3>
+    <p>Our design successfully met all of our initial project goals:</p>
+    <ul>
+        <li><strong>Sensor Integration:</strong> We achieved reliable sensor data collection from all three sensing functionalities (distance, temperature, orientation), integrated the data in real-time for autonomous decision-making, and implemented movement control.</li>
+        <li><strong>Locomotion:</strong> The robot demonstrated successful walking, in-place rotation for scanning, and special movement sequences including waving, shuffling, and squatting.</li>
+        <li><strong>Mapping:</strong> The mapping system successfully captured 360-degree environmental scans at high sampling rates (~100 Hz) without data loss.</li>
+        <li><strong>Wireless Control:</strong> The WiFi control system provided responsive command and control with stable data streaming at 10 Hz.</li>
+        <li><strong>Safety:</strong> From a safety perspective, the robot operates at safe voltage levels (5V) and has minimal force capability, conforming to human-safe interaction principles. All connections to the power supply were covered in electrical tape to prevent shorting during operation.</li>
+    </ul>
+
+    <h3>Intellectual Property Considerations</h3>
+
+    <h4>Reused Code and Designs</h4>
+    <p>Yes, we based our work on existing open-source resources with proper attribution:</p>
+    <ul>
+        <li><strong>Leg CAD Geometry:</strong> Adapted from <a href="https://www.instructables.com/3D-Printed-Raspberry-Pi-Spider-Robot-Platform/" target="_blank">Instructables quadruped design</a> (Creative Commons license)</li>
+        <li><strong>Movement Library:</strong> Used an open-source Python movement library for 12-servo quadrupeds as a reference, translating the servo sequences to C and adapting them for our specific hardware configuration and channel mapping</li>
+        <li><strong>Sensor Drivers:</strong> Referenced open-source GitHub and Arduino libraries for sensor .c and .h file structure, adapting them for Pico SDK compatibility</li>
+        <li><strong>WiFi Implementation:</strong> Based on Bruce Land's WiFi access point example code for Pico W</li>
+        <li><strong>Original Contributions:</strong> The body design, sensor mounting system, sensor fusion algorithms, mapping implementation, thermal scanning behavior, and main control architecture are our original work</li>
+    </ul>
+
+    <h4>Additional IP Considerations</h4>
+    <p>We used the Raspberry Pi Pico SDK (BSD-3-Clause license) and referenced publicly available sensor datasheets for I2C protocol implementation. No reverse engineering was performed; all commercial products were used as intended by their manufacturers. No NDAs were required as all components were purchased through standard retail channels with publicly available documentation.</p>
+
+    <p>While individual techniques we used are well-established in robotics, potential patent opportunities could focus on the specific combination of thermal sensing with autonomous quadruped navigation for target identification in search-and-rescue or inspection applications. However, as an educational project for ECE 4760 at Cornell University, we have no plans to pursue intellectual property protection and aim to contribute to the open-source robotics community by sharing our work.</p>
+
+    <h3>Project Success</h3>
+    <p>This project successfully demonstrated that sophisticated multi-sensor autonomous robotics is achievable on an affordable microcontroller platform. The integration of mechanical engineering (custom CAD design, 3D printing), electrical engineering (sensor fusion, I2C communication, PWM control), and software engineering (cooperative multitasking, state machines, network protocols) resulted in a capable platform for future experimentation. The robot serves as an excellent educational tool and foundation for more advanced autonomous behaviors.</p>
 </section>
 
 <section id="appendix">
