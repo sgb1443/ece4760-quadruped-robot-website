@@ -507,12 +507,14 @@ y_coords = [r * math.sin(t) for r, t in zip(distances, theta_rad)]</pre>
     // Apply to specified leg...
 }</pre>
 
-                <h4>Power Calculations</h4>
-                <p>Peak current draw calculation:</p>
-                <p style="text-align: center; font-style: italic;">I<sub>total</sub> = I<sub>Pico</sub> + (12 × I<sub>servo</sub>) + I<sub>sensors</sub></p>
-                <p style="text-align: center; font-style: italic;">I<sub>total</sub> = 200mA + (12 × 250mA) + 160mA = 3.36A</p>
+              <h4>Power Calculations</h4>
+<p>Peak current draw calculation:</p>
+<p style="text-align: center; font-style: italic;">I<sub>total</sub> = I<sub>Pico</sub> + (12 × I<sub>servo</sub>) + I<sub>sensors</sub></p>
+<p style="text-align: center; font-style: italic;">I<sub>total</sub> = 200mA + (12 × 250mA) + 160mA = 3.36A</p>
 
-                <p>Average power during typical operation: P = V × I = 5V × 2A ≈ 10W</p>
+<p>We used a 5V bench supply with 2.5A maximum. Average current during typical operation was ~2A, with gaits naturally staggering servo movements to avoid simultaneous peak loads. Further explanation of the choice to use bench power and the current limitations is discussed in detail in the Hardware/Software Tradeoffs section below.</p>
+
+<p>Average power during typical operation: P = V × I = 5V × 2A ≈ 10W</p>
 
                 <h3 id="logical-structure">Logical Structure</h3>
                 <p>Our software follows a modular architecture with clear separation of concerns across multiple files. The codebase is organized into functional groups for maintainability and reusability:</p>
